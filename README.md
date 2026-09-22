@@ -188,6 +188,20 @@ For this existing workspace, rerun **`make phase3` only**. Once partitions are f
 full-cohort Phase 2 EDA is blocked; use its archived notebook/reports. Do not delete the lock
 to explore test data. `make split` verifies existing hashes or reconstructs the same assignments
 from verified raw data in a fresh checkout; it refuses silent reallocation or overwrite.
+CI executes source inspection and EDA first, then explicitly runs `make split` before
+`make phase3`. Freezing before the EDA notebook would correctly trigger the test-access guard.
+The baseline-notebook target also verifies the split as a prerequisite.
+
+Frozen CSV serialization fixes UTF-8, LF line endings, compression level, zero timestamp and
+the original gzip OS header byte (19). Python 3.12 otherwise lets zlib write a host-dependent
+OS byte, changing compressed-file hashes without changing patient assignments
+([Python gzip documentation](https://docs.python.org/3.12/library/gzip.html#gzip.compress)).
+The original manifest, partition hashes and allocation are preserved. Reconstruction is staged
+and checked against the entire committed contract before becoming the local frozen split;
+a mismatch leaves the manifest untouched and no replacement lock.
+Fifteen additional split regression cases cover platform headers, reconstruction and failure
+handling; the current local suite passes all 108 tests. Phase 3 reports retain their original
+execution results.
 
 `requirements.txt` pins the environment used by all three phases. No Phase 2/3 dependency was added.
 Platform-only packages use markers.

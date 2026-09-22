@@ -30,6 +30,6 @@ split:
 baselines:
 	$(PYTHON) -m readmit_iq.modeling.train
 	$(PYTHON) -m readmit_iq.modeling.reports
-baseline-notebook:
+baseline-notebook: split
 	$(PYTHON) scripts/execute_notebook.py notebooks/03_feature_engineering_and_baselines.ipynb
 phase3: baseline-notebook verify lint test

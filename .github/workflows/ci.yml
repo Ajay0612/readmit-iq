@@ -25,7 +25,11 @@ jobs:
         run: make install
       - name: Download and verify the public source
         run: make download inspect
-      - name: Execute notebooks, verify environment, lint and test
+      - name: Execute source and EDA notebooks before freezing
+        run: make notebook eda-notebook
+      - name: Verify frozen patient split
+        run: make split
+      - name: Execute baseline notebook, verify environment, lint and test
         env:
           LOKY_MAX_CPU_COUNT: "2"
-        run: make notebook eda-notebook phase3
+        run: make phase3

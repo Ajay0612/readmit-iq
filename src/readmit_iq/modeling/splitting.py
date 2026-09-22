@@ -5,6 +5,7 @@ import json
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -104,8 +105,27 @@ def validate_split(
 
 
 def compressed_csv(frame: pd.DataFrame, path: Path) -> None:
-    """Portable deterministic gzip CSV; no new Parquet dependency or duplicate Git data."""
-    path.write_bytes(gzip.compress(frame.to_csv(index=False, na_rep="").encode(), mtime=0))
+    """Reproduce the original frozen gzip bytes across operating systems.
+
+    Python 3.11/3.12 delegate mtime=0 to zlib, which embeds the host OS byte.
+    Retain the original manifest's byte 19 (macOS), even on another host, so
+    existing hashes remain valid. This is archive compatibility metadata only.
+    """
+    payload = frame.to_csv(index=False, na_rep="", lineterminator="\n").encode("utf-8")
+    compressed = gzip.compress(payload, compresslevel=9, mtime=0)
+    path.write_bytes(compressed[:9] + b"\x13" + compressed[10:])
+
+
+def verify_reproduction(prior: dict, reproduced: dict) -> None:
+    """Require the complete frozen contract to match, except the new creation time."""
+    changed = sorted(
+        key
+        for key in prior.keys() | reproduced.keys()
+        if key != "created_at_utc" and prior.get(key) != reproduced.get(key)
+    )
+    if changed:
+        LOGGER.error("Frozen split reproduction differs in: %s", ", ".join(changed))
+        raise ValueError("Reproduction does not match committed split manifest")
 
 
 def freeze_partitions(
@@ -173,6 +193,8 @@ def prepare_frozen_partitions() -> dict:
             raise ValueError("Tracked split manifest disagrees with frozen lock")
         LOGGER.info("Verified frozen partition hashes; no test table opened")
         return lock
+    if directory.exists() and any(directory.iterdir()):
+        raise FileExistsError("Frozen partition destination already contains artifacts")
     raw = load_raw(source.raw_dir / "diabetic_data.csv")
     cohort, _ = build_cohort(raw, load_phase2_config(root / "configs/phase2.yaml")["cohort"])
     expected = json.loads((root / "reports/eda/summary.json").read_text())["primary"]
@@ -183,19 +205,21 @@ def prepare_frozen_partitions() -> dict:
     )
     if any(actual[k] != expected[k] for k in actual):
         raise ValueError("Phase 2 cohort does not reconcile")
-    lock = freeze_partitions(cohort, directory, policy["split"], policy["random_seed"], provenance)
-    if report_path.exists():
-        prior = json.loads(report_path.read_text())
-        if (
-            prior["files"] != lock["files"]
-            or prior["partitions"] != lock["partitions"]
-            or prior["provenance"] != provenance
-        ):
-            raise ValueError("Reproduction does not match committed split manifest")
-        # Preserve the original freeze date when reconstructing exactly the same partitions.
-        lock = prior
-        write_json(lock_path, lock)
-    else:
+    # Verify in a temporary sibling; a rejected reconstruction must not leave a frozen lock.
+    directory.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=directory.parent, prefix=".verify-split-") as temporary:
+        staged = Path(temporary) / "partitions"
+        lock = freeze_partitions(cohort, staged, policy["split"], policy["random_seed"], provenance)
+        if report_path.exists():
+            prior = json.loads(report_path.read_text())
+            verify_reproduction(prior, lock)
+            # Preserve the original freeze date only after the entire contract matches.
+            lock = prior
+            write_json(staged / "lock.json", lock)
+        if directory.exists():
+            directory.rmdir()  # Only an empty destination can be replaced.
+        staged.rename(directory)
+    if not report_path.exists():
         write_json(report_path, lock)
     report = "# Frozen patient-grouped partitions\n\n" + markdown_table(
         pd.DataFrame(lock["partitions"])
