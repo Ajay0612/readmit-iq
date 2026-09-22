@@ -200,8 +200,8 @@ The original manifest, partition hashes and allocation are preserved. Reconstruc
 and checked against the entire committed contract before becoming the local frozen split;
 a mismatch leaves the manifest untouched and no replacement lock.
 Fifteen additional split regression cases cover platform headers, reconstruction and failure
-handling; the current local suite passes all 108 tests. Phase 3 reports retain their original
-execution results.
+handling; eleven reporting cases protect reviewed conclusions. The current local suite passes
+all 119 tests. Phase 3 reports retain their original execution results.
 
 `requirements.txt` pins the environment used by all three phases. No Phase 2/3 dependency was added.
 Platform-only packages use markers.
@@ -225,6 +225,11 @@ must use this project's virtual environment. No global kernel registration is re
 environment, lint and complete test checks. Model settings and paths live in `configs/phase3.yaml`.
 Reviewed report prose is guarded against changed AP/error evidence; new experiments require a
 fresh review of conclusions rather than silently retaining the prior narrative.
+The [CI reproduction review](reports/modeling/ci_reproduction_review.md) records the small
+random-forest difference observed between macOS arm64 and Linux x86_64. Both reviewed AP values
+are explicitly recognized with the original numerical tolerance; other changes still require
+review. Forest comparison prose uses the current paired estimate and interval, and checks that
+its ranking, inconclusive interval and default-threshold confusion counts remain unchanged.
 
 Source settings live in `configs/config.yaml`; Phase 2 policy lives in `configs/phase2.yaml`.
 Source hashes enforce the reviewed release. A changed

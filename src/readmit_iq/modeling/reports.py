@@ -180,6 +180,57 @@ def feature_manifest(root: Path) -> None:
     (root / "reports/modeling/model_feature_manifest.md").write_text(text)
 
 
+def verify_reviewed_results(
+    results: pd.DataFrame, differences: pd.DataFrame, errors: pd.DataFrame
+) -> None:
+    """Require reviewed metrics and unchanged evidence for the written recommendations."""
+    by_name = results.set_index("name")
+    reviewed_ap = {
+        "naive_prevalence": 0.11030,
+        "logistic": 0.19428,
+        "logistic_balanced": 0.19387,
+        "random_forest": 0.19747,
+        "histogram_boosting": 0.20218,
+        "logistic_raw_utilization": 0.19641,
+        "logistic_no_utilization": 0.15492,
+        "logistic_no_disposition": 0.17999,
+        "logistic_diagnosis_groups": 0.19597,
+        "logistic_diagnosis_raw": 0.19832,
+        "logistic_encounter_summaries": 0.19469,
+    }
+    if results.name.duplicated().any() or set(results.name) != set(reviewed_ap):
+        raise ValueError("Experiment registry changed: review narrative before publication")
+    # Explicitly reviewed macOS arm64 and Linux x86_64 reproductions; not a wider tolerance.
+    # Full comparison and run provenance: reports/modeling/ci_reproduction_review.md.
+    reviewed_forest_ap = (0.19747, 0.19771)
+    if any(
+        not any(
+            np.isfinite(by_name.loc[name, "average_precision"])
+            and abs(by_name.loc[name, "average_precision"] - reference) <= 0.00001
+            for reference in (reviewed_forest_ap if name == "random_forest" else (ap,))
+        )
+        for name, ap in reviewed_ap.items()
+    ):
+        raise ValueError("Validation results changed: review narrative before regenerating reports")
+    high_use = errors.loc[errors.group.eq("prior_inpatient") & errors.level.eq("3+")].iloc[0]
+    if high_use["fn"] != 219 or high_use.predicted_positives != 13:
+        raise ValueError("Error evidence changed: review narrative before publication")
+    forest = differences.set_index(["model", "reference"]).loc[("random_forest", "logistic")]
+    actual_delta = (
+        by_name.loc["random_forest", "average_precision"]
+        - by_name.loc["logistic", "average_precision"]
+    )
+    if not (
+        0 < actual_delta
+        and by_name.loc["random_forest", "average_precision"]
+        < by_name.loc["histogram_boosting", "average_precision"]
+        and np.isclose(forest.ap_difference, actual_delta, rtol=0, atol=1e-12)
+        and forest.ci_low < 0 < forest.ci_high
+        and by_name.loc["random_forest", ["tn", "fp", "fn", "tp"]].tolist() == [12091, 0, 1499, 0]
+    ):
+        raise ValueError("Forest comparison changed: review narrative before publication")
+
+
 def build_reports() -> None:
     root, policy = settings()
     out = root / policy["modeling"]["report_dir"]
@@ -188,6 +239,7 @@ def build_reports() -> None:
     differences = pd.read_csv(out / "feature_ablation_results.csv")
     calibration = pd.read_csv(out / "calibration_bins.csv")
     errors = pd.read_csv(out / "validation_error_groups.csv", keep_default_na=False, na_values=[""])
+    verify_reviewed_results(results, differences, errors)
     predictions = pd.read_csv(
         root / policy[("modeling")][("artifact_dir")] / ("validation_predictions.csv.gz")
     )
@@ -214,30 +266,6 @@ def build_reports() -> None:
         "brier",
     ]
     primary = results.loc[results.role.isin(["primary", "baseline"])]
-    by_name = results.set_index("name")
-    # Narrative below is an analyst-reviewed snapshot, not automatically inferred prose.
-    # Refuse to publish stale conclusions if a later experiment changes the evidence.
-    reviewed_ap = {
-        "naive_prevalence": 0.11030,
-        "logistic": 0.19428,
-        "logistic_balanced": 0.19387,
-        "random_forest": 0.19747,
-        "histogram_boosting": 0.20218,
-        "logistic_raw_utilization": 0.19641,
-        "logistic_no_utilization": 0.15492,
-        "logistic_no_disposition": 0.17999,
-        "logistic_diagnosis_groups": 0.19597,
-        "logistic_diagnosis_raw": 0.19832,
-        "logistic_encounter_summaries": 0.19469,
-    }
-    if any(
-        abs(by_name.loc[name, "average_precision"] - ap) > 0.00001
-        for name, ap in reviewed_ap.items()
-    ):
-        raise ValueError("Validation results changed: review narrative before regenerating reports")
-    high_use = errors.loc[errors.group.eq("prior_inpatient") & errors.level.eq("3+")].iloc[0]
-    if high_use["fn"] != 219 or high_use.predicted_positives != 13:
-        raise ValueError("Error evidence changed: review narrative before publication")
     text = "# Phase 3 validation baselines\n\n"
     text += (
         "All results below use the frozen **validation** partition. Test has not been evaluated. "
@@ -337,7 +365,11 @@ def build_reports() -> None:
         "- Histogram boosting improves AP by 0.0079 over the matched logistic "
         "baseline (0.0015–0.0143): a modest development gain. "
     )
-    text += "Random forest adds 0.0032 (−0.0034 to +0.0106), which is inconclusive.\n"
+    forest = differences.set_index(["model", "reference"]).loc[("random_forest", "logistic")]
+    text += (
+        f"Random forest adds {forest.ap_difference:.4f} "
+        f"({forest.ci_low:+.4f} to {forest.ci_high:+.4f}), which is inconclusive.\n"
+    )
     text += (
         "- Balanced logistic weights leave AP essentially unchanged (−0.0004), "
         "increase recall from 0.004 to 0.532 "
