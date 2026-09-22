@@ -1,0 +1,69 @@
+# Policy decisions use disposition semantics, not the observed readmission rate.
+cohort:
+  name: confirmed_discharge_outreach
+  scoring_time: After the discharge destination and encounter record are available
+  included_codes: [1, 3, 4, 6, 7, 8, 16, 17, 22, 24]
+  exclusions:
+    death:
+      codes: [11, 19, 20, 21]
+      reason: Death-coded encounters are outside a live-discharge outreach population.
+    hospice:
+      codes: [13, 14]
+      reason: Hospice needs a separate goal-concordant pathway; readmission is possible but is not the standard outreach objective.
+    inpatient_transfer:
+      codes: [2, 5, 10, 23, 27, 28, 29]
+      reason: Continued hospital or unspecified inpatient care; a completed discharge episode cannot be reconstructed without dates.
+    discharge_not_confirmed:
+      codes: [9, 12, 15]
+      reason: Still admitted, ambiguous still-patient status, or within-institution swing-bed continuation.
+    unknown_destination:
+      codes: [18, 25, 26, 30]
+      reason: Destination is unknown or insufficiently specified to confirm eligibility; retain separately for sensitivity analysis.
+  sensitivity:
+    retain_unknown_codes: [18, 25, 26, 30]
+    remove_mixed_rehab_codes: [22]
+    community_only_codes: [1, 6, 7, 8, 16, 17]
+  flagged_retained_codes:
+    7: Left against medical advice; outreach remains relevant, so this is not a CMS quality-measure exclusion.
+    22: Mixed rehabilitation category includes hospital units; retained for coordinated postacute outreach, with exclusion sensitivity reported.
+missingness:
+  source_markers: ['?']
+  preserve_literal_none: [A1Cresult, max_glu_serum]
+preliminary_model_exclusions:
+  encounter_id: Identifier only; never a predictor or a chronology surrogate.
+  patient_nbr: Grouping and audit key only.
+  readmitted: Original outcome; including it as a predictor is direct target leakage.
+  readmitted_lt30: Binary outcome; never in the predictor matrix.
+  examide: Constant in the raw release and eligible cohort.
+  citoglipton: Constant in the raw release and eligible cohort; preserve source spelling.
+  weight: Exclude from the first modeling pass due to sparse coverage; retain in analytical data for sensitivity work.
+eda:
+  report_dir: reports/eda
+  figure_dir: reports/figures/eda
+  interim_dir: data/interim
+  confidence_level: 0.95
+  ci_min_patients: 30
+  ci_min_events: 10
+  numeric_bins:
+    time_in_hospital:
+      edges: [0, 2, 4, 7, 14]
+      labels: ['1–2 days', '3–4 days', '5–7 days', '8–14 days']
+    num_medications:
+      edges: [0, 9, 19, 29, 1000]
+      labels: ['1–9', '10–19', '20–29', '30+']
+    num_lab_procedures:
+      edges: [0, 20, 40, 60, 80, 1000]
+      labels: ['1–20', '21–40', '41–60', '61–80', '81+']
+    num_procedures:
+      edges: [-1, 0, 1, 2, 1000]
+      labels: ['0', '1', '2', '3+']
+    number_diagnoses:
+      edges: [0, 4, 6, 8, 1000]
+      labels: ['1–4', '5–6', '7–8', '9+']
+split_design:
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+  grouping_key: patient_nbr
+  allocation_unit: patient
+  implemented: false
