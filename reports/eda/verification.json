@@ -1,0 +1,83 @@
+{
+  "phase": 2,
+  "raw_checksums_verified": true,
+  "analytical_columns_match_raw_except_literal_question_mark_normalization": true,
+  "membership_complete_and_disjoint_by_encounter": true,
+  "eligible_encounters": 90702,
+  "eligible_patients": 65044,
+  "positive_labels": 10054,
+  "feature_audit_covers_all_50_source_fields": true,
+  "every_grouped_rate_table_reconciles_to_cohort": true,
+  "notebook_code_cells_executed": 11,
+  "notebook_error_outputs": 0,
+  "notebook_embedded_figures": 7,
+  "figures_visually_reviewed": [
+    "01_target_prevalence.png",
+    "02_prior_utilization.png",
+    "03_length_of_stay.png",
+    "04_medication_count.png",
+    "05_age.png",
+    "06_discharge_destination.png",
+    "07_missingness.png"
+  ],
+  "figure_sha256": {
+    "01_target_prevalence.png": "61704aaaf775bf7195246a95b81c01d32d3d5fcb4954ea1dcaa9693912c4370b",
+    "02_prior_utilization.png": "977554950db37d8f1bc9c8a0b38138c6d3684e0b825170fc883a9cdb4fa1cc1d",
+    "03_length_of_stay.png": "11a3bacc94f16a93027f714a396feec22e47a59abdf2609fc0e32285f3311ea6",
+    "04_medication_count.png": "e3714bc8b0176d6f7f1b624555ff9d9b2c310f409c26a084c8bf1babccb6ff84",
+    "05_age.png": "7629ad8c5f4cfd2c20e68908181db5fe8078a77470ac41fc41b6923afd669edc",
+    "06_discharge_destination.png": "6d34825893633771b1b673af6441a002116492b59c4f489e6e4ebd14e9e0bcc7",
+    "07_missingness.png": "b5f8158cfa6075423886b343bc3431c1eda5af4189c899f0d251ddb246c8bc5c"
+  },
+  "local_document_links_checked": 23,
+  "test_suite": "38 passed (14 existing + 24 Phase 2)",
+  "ruff_check": "passed",
+  "ruff_format_check": "passed",
+  "environment_imports_and_virtualenv": "passed",
+  "pip_check": "No broken requirements found",
+  "models_trained": 0,
+  "partitions_created": false,
+  "github_actions": "Configured; not remotely executed because no remote exists",
+  "proposed_patient_strata_counts_no_assignments": [
+    {
+      "encounter_bucket": "1",
+      "any_positive": 0,
+      "patients": 48273
+    },
+    {
+      "encounter_bucket": "1",
+      "any_positive": 1,
+      "patients": 2208
+    },
+    {
+      "encounter_bucket": "2",
+      "any_positive": 0,
+      "patients": 6591
+    },
+    {
+      "encounter_bucket": "2",
+      "any_positive": 1,
+      "patients": 2647
+    },
+    {
+      "encounter_bucket": "3",
+      "any_positive": 0,
+      "patients": 1559
+    },
+    {
+      "encounter_bucket": "3",
+      "any_positive": 1,
+      "patients": 1309
+    },
+    {
+      "encounter_bucket": "4+",
+      "any_positive": 0,
+      "patients": 690
+    },
+    {
+      "encounter_bucket": "4+",
+      "any_positive": 1,
+      "patients": 1767
+    }
+  ]
+}

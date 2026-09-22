@@ -1,0 +1,286 @@
+{
+  "phase1_reconciled": true,
+  "raw": {
+    "encounters": 101766,
+    "patients": 71518,
+    "positives": 11357,
+    "negatives": 90409,
+    "prevalence_pct": 11.159915885462729
+  },
+  "primary": {
+    "encounters": 90702,
+    "patients": 65044,
+    "positives": 10054,
+    "negatives": 80648,
+    "prevalence_pct": 11.084650834601222
+  },
+  "excluded_encounters": 11064,
+  "repeat_patients": {
+    "patients": 65044,
+    "repeat_patients": 14563,
+    "repeat_encounters": 40221,
+    "repeat_encounter_fraction": 0.44344115896011116,
+    "maximum_encounters": 39,
+    "contrast": {
+      "high": "Repeated",
+      "low": "Single",
+      "high_n": 40221,
+      "low_n": 50481,
+      "high_rate": 0.1950722259516173,
+      "low_rate": 0.04373922862066916,
+      "difference_pp": 15.133299733094812,
+      "difference_ci_low_pp": 14.658177287234237,
+      "difference_ci_high_pp": 15.608422178955388,
+      "rate_ratio": 4.459891774575903
+    },
+    "hypothetical_encounter_split": {
+      "expected_patients_in_multiple_partitions": 8180.070728778472,
+      "test_encounter_probability_patient_also_in_train": 0.37206824638287744,
+      "assumption": "Independent 70/15/15 encounter assignment; no partitions created",
+      "limitation": "Estimates identity overlap, not metric inflation"
+    }
+  },
+  "raw_repeat_patients": {
+    "patients": 71518,
+    "repeat_patients": 16773,
+    "repeat_encounters": 47021,
+    "repeat_encounter_fraction": 0.4620501935813533,
+    "maximum_encounters": 40,
+    "contrast": {
+      "high": "Repeated",
+      "low": "Single",
+      "high_n": 47021,
+      "low_n": 54745,
+      "high_rate": 0.195465855681504,
+      "low_rate": 0.039565257101105124,
+      "difference_pp": 15.59005985803989,
+      "difference_ci_low_pp": 15.15276863668395,
+      "difference_ci_high_pp": 16.027351079395828,
+      "rate_ratio": 4.940340844544754
+    },
+    "hypothetical_encounter_split": {
+      "expected_patients_in_multiple_partitions": 9494.52223729733,
+      "test_encounter_probability_patient_also_in_train": 0.3898471677535968,
+      "assumption": "Independent 70/15/15 encounter assignment; no partitions created",
+      "limitation": "Estimates identity overlap, not metric inflation"
+    }
+  },
+  "contrasts": {
+    "prior_inpatient_3plus_vs_0": {
+      "high": "3+",
+      "low": "0",
+      "high_n": 6211,
+      "low_n": 60475,
+      "high_rate": 0.26195459668330384,
+      "low_rate": 0.0834063662670525,
+      "difference_pp": 17.854823041625135,
+      "difference_ci_low_pp": 16.44459500106811,
+      "difference_ci_high_pp": 19.26505108218216,
+      "rate_ratio": 3.140702663446233
+    },
+    "prior_emergency_3plus_vs_0": {
+      "high": "3+",
+      "low": "0",
+      "high_n": 1575,
+      "low_n": 80198,
+      "high_rate": 0.25396825396825395,
+      "low_rate": 0.10339409960348138,
+      "difference_pp": 15.057415436477257,
+      "difference_ci_low_pp": 12.152801965988237,
+      "difference_ci_high_pp": 17.962028906966275,
+      "rate_ratio": 2.4563128354734722
+    },
+    "outpatient_3plus_vs_1": {
+      "high": "3+",
+      "low": "1",
+      "high_n": 4247,
+      "low_n": 7855,
+      "high_rate": 0.13115140098893335,
+      "low_rate": 0.1372374283895608,
+      "difference_pp": -0.6086027400627442,
+      "difference_ci_low_pp": -2.0160084255481867,
+      "difference_ci_high_pp": 0.7988029454226981,
+      "rate_ratio": 0.9556532975585078
+    },
+    "stay_8to14_vs_1to2": {
+      "high": "8\u201314 days",
+      "low": "1\u20132 days",
+      "high_n": 12900,
+      "low_n": 28334,
+      "high_rate": 0.1344186046511628,
+      "low_rate": 0.09084492129596951,
+      "difference_pp": 4.357368335519328,
+      "difference_ci_low_pp": 3.65010190091154,
+      "difference_ci_high_pp": 5.064634770127116,
+      "rate_ratio": 1.4796490847653638
+    },
+    "medications_20to29_vs_1to9": {
+      "high": "20\u201329",
+      "low": "1\u20139",
+      "high_n": 19142,
+      "low_n": 18236,
+      "high_rate": 0.130028210218368,
+      "low_rate": 0.08609344154419829,
+      "difference_pp": 4.393476867416971,
+      "difference_ci_low_pp": 3.7226861984456274,
+      "difference_ci_high_pp": 5.064267536388313,
+      "rate_ratio": 1.5103149309185724
+    },
+    "medications_30plus_vs_20to29": {
+      "high": "30+",
+      "low": "20\u201329",
+      "high_n": 5208,
+      "low_n": 19142,
+      "high_rate": 0.12788018433179724,
+      "low_rate": 0.130028210218368,
+      "difference_pp": -0.2148025886570759,
+      "difference_ci_low_pp": -1.2462562553532903,
+      "difference_ci_high_pp": 0.8166510780391385,
+      "rate_ratio": 0.9834803087502059
+    },
+    "rehab_vs_home": {
+      "high": "22",
+      "low": "1",
+      "high_n": 1993,
+      "low_n": 60234,
+      "high_rate": 0.2769693928750627,
+      "low_rate": 0.09300395125676528,
+      "difference_pp": 18.396544161829745,
+      "difference_ci_low_pp": 16.387587830639177,
+      "difference_ci_high_pp": 20.405500493020313,
+      "rate_ratio": 2.978038987939402
+    }
+  },
+  "utilization_shapes": {
+    "number_inpatient": {
+      "support_rule": "Exact-count categories with at least 100 encounters",
+      "monotonic_increasing_observed_rate": false,
+      "maximum_supported_count": 9,
+      "interpretation": "Descriptive shape only; no fitted monotonic constraint"
+    },
+    "number_emergency": {
+      "support_rule": "Exact-count categories with at least 100 encounters",
+      "monotonic_increasing_observed_rate": false,
+      "maximum_supported_count": 5,
+      "interpretation": "Descriptive shape only; no fitted monotonic constraint"
+    },
+    "number_outpatient": {
+      "support_rule": "Exact-count categories with at least 100 encounters",
+      "monotonic_increasing_observed_rate": false,
+      "maximum_supported_count": 7,
+      "interpretation": "Descriptive shape only; no fitted monotonic constraint"
+    }
+  },
+  "missingness_contrasts": {
+    "weight": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 87689,
+      "low_n": 3013,
+      "high_rate": 0.11083488236837004,
+      "low_rate": 0.11118486558247594,
+      "difference_pp": -0.03499832141058978,
+      "difference_ci_low_pp": -1.22007808219296,
+      "difference_ci_high_pp": 1.1500814393717804,
+      "rate_ratio": 0.9968522405250715
+    },
+    "medical_specialty": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 43794,
+      "low_n": 46908,
+      "high_rate": 0.11524409736493584,
+      "low_rate": 0.10674085443847531,
+      "difference_pp": 0.8503242926460528,
+      "difference_ci_low_pp": 0.3770310630850804,
+      "difference_ci_high_pp": 1.323617522207025,
+      "rate_ratio": 1.0796624963440005
+    },
+    "payer_code": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 33090,
+      "low_n": 57612,
+      "high_rate": 0.1115140525838622,
+      "low_rate": 0.11046309796570158,
+      "difference_pp": 0.10509546181606128,
+      "difference_ci_low_pp": -0.3824457757714102,
+      "difference_ci_high_pp": 0.5926366994035328,
+      "rate_ratio": 1.0095140787965853
+    },
+    "admission_type_id": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 8671,
+      "low_n": 82031,
+      "high_rate": 0.1089839695536847,
+      "low_rate": 0.11104338603698602,
+      "difference_pp": -0.2059416483301324,
+      "difference_ci_low_pp": -0.9470196067015314,
+      "difference_ci_high_pp": 0.5351363100412666,
+      "rate_ratio": 0.9814539473551772
+    },
+    "admission_source_id": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 6149,
+      "low_n": 84553,
+      "high_rate": 0.10440722068629045,
+      "low_rate": 0.11131479663642922,
+      "difference_pp": -0.6907575950138772,
+      "difference_ci_low_pp": -1.570369367373265,
+      "difference_ci_high_pp": 0.18885417734551077,
+      "rate_ratio": 0.9379455727462724
+    },
+    "race": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 2085,
+      "low_n": 88617,
+      "high_rate": 0.07961630695443644,
+      "low_rate": 0.11158129929923152,
+      "difference_pp": -3.196499234479508,
+      "difference_ci_low_pp": -4.461696448134841,
+      "difference_ci_high_pp": -1.931302020824174,
+      "rate_ratio": 0.7135273334730273
+    },
+    "diag_3": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 1307,
+      "low_n": 89395,
+      "high_rate": 0.06350420811017597,
+      "low_rate": 0.11153867665976844,
+      "difference_pp": -4.803446854959247,
+      "difference_ci_low_pp": -6.8784742617932455,
+      "difference_ci_high_pp": -2.728419448125248,
+      "rate_ratio": 0.5693469746273374
+    },
+    "diag_2": {
+      "high": "Unknown",
+      "low": "Observed",
+      "high_n": 334,
+      "low_n": 90368,
+      "high_rate": 0.07784431137724551,
+      "low_rate": 0.11096848441926345,
+      "difference_pp": -3.312417304201794,
+      "difference_ci_low_pp": -6.323840884260075,
+      "difference_ci_high_pp": -0.3009937241435123,
+      "rate_ratio": 0.7014992750836581
+    }
+  },
+  "figure_files": [
+    "01_target_prevalence.png",
+    "02_prior_utilization.png",
+    "03_length_of_stay.png",
+    "04_medication_count.png",
+    "05_age.png",
+    "06_discharge_destination.png",
+    "07_missingness.png"
+  ],
+  "cohort_file_sha256": "f54f6a7aa0bc44c8c6aca41b18e26ed8b6b94bc3271713aa18c10ff8bd366cae",
+  "policy_sha256": "cd122f1dd95658b80caca50b26fff278289f393afb7a7df0d9944e149919bedf",
+  "models_trained": 0,
+  "partitions_created": false,
+  "uncertainty": "Encounter rates; normal sandwich intervals with patient-cluster variance"
+}

@@ -1,0 +1,4 @@
+feature,number_inpatient,number_emergency,number_outpatient
+number_inpatient,1.0,0.22624844421155493,0.15593741324132918
+number_emergency,0.22624844421155493,1.0,0.1761953910202275
+number_outpatient,0.15593741324132918,0.1761953910202275,1.0

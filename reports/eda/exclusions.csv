@@ -1,0 +1,6 @@
+reason,codes,encounters,positives,rationale
+death,"11, 19, 20, 21",1652,0,Death-coded encounters are outside a live-discharge outreach population.
+hospice,"13, 14",771,43,Hospice needs a separate goal-concordant pathway; readmission is possible but is not the standard outreach objective.
+inpatient_transfer,"2, 5, 10, 23, 27, 28, 29",3874,670,Continued hospital or unspecified inpatient care; a completed discharge episode cannot be reconstructed without dates.
+discharge_not_confirmed,"9, 12, 15",87,39,"Still admitted, ambiguous still-patient status, or within-institution swing-bed continuation."
+unknown_destination,"18, 25, 26, 30",4680,551,Destination is unknown or insufficiently specified to confirm eligibility; retain separately for sensitivity analysis.

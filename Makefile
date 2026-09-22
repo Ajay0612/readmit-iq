@@ -1,7 +1,7 @@
 PYTHON ?= .venv/bin/python
 RUFF = .venv/bin/ruff
 
-.PHONY: install download inspect notebook verify test lint phase1
+.PHONY: install download inspect notebook verify test lint phase1 eda eda-notebook phase2
 install:
 	$(PYTHON) -m pip install -r requirements.txt
 	$(PYTHON) -m pip install --no-deps --no-build-isolation .
@@ -20,3 +20,8 @@ lint:
 	$(RUFF) check .
 	$(RUFF) format --check .
 phase1: download inspect notebook verify lint test
+eda:
+	$(PYTHON) -m readmit_iq.analysis.run_phase2
+eda-notebook:
+	$(PYTHON) scripts/execute_notebook.py notebooks/02_eda.ipynb
+phase2: eda-notebook verify lint test

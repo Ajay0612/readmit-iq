@@ -1,4 +1,4 @@
-name: Phase 1 checks
+name: Data and EDA checks
 
 on:
   push:
@@ -21,9 +21,9 @@ jobs:
           cache: pip
       - name: Create environment
         run: python -m venv .venv
-      - name: Install Phase 1 dependencies
+      - name: Install project dependencies
         run: make install
-      - name: Lint and test without downloading patient records
-        run: make lint test
       - name: Download and verify the public source
-        run: make download inspect verify
+        run: make download inspect
+      - name: Execute EDA, verify environment, lint and test
+        run: make phase2

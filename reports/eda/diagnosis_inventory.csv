@@ -1,0 +1,16 @@
+feature,format,encounters,raw_observed_cardinality,integer_prefix_cardinality,codes_with_under_20_encounters,encounters_in_codes_under_20
+diag_1,Numeric with three-digit component,87017,708,675,407,2272
+diag_1,Numeric with short integer component,2288,708,675,407,2272
+diag_1,V supplementary code,1381,708,675,407,2272
+diag_1,Unknown,15,708,675,407,2272
+diag_1,E external-cause code,1,708,675,407,2272
+diag_2,Numeric with three-digit component,86687,740,707,460,2384
+diag_2,V supplementary code,1644,740,707,460,2384
+diag_2,Numeric with short integer component,1360,740,707,460,2384
+diag_2,E external-cause code,677,740,707,460,2384
+diag_2,Unknown,334,740,707,460,2384
+diag_3,Numeric with three-digit component,83418,776,744,496,2756
+diag_3,V supplementary code,3465,776,744,496,2756
+diag_3,Numeric with short integer component,1353,776,744,496,2756
+diag_3,Unknown,1307,776,744,496,2756
+diag_3,E external-cause code,1159,776,744,496,2756

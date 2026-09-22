@@ -1,5 +1,6 @@
-"""Execute the data-understanding notebook using the current virtual environment."""
+"""Execute a project notebook using the current virtual environment."""
 
+import argparse
 import os
 import sys
 from pathlib import Path
@@ -13,7 +14,10 @@ root = Path(__file__).resolve().parents[1]
 os.environ.setdefault("MPLCONFIGDIR", str(root / ".cache/matplotlib"))
 os.environ.setdefault("IPYTHONDIR", str(root / ".cache/ipython"))
 os.environ.setdefault("JUPYTER_RUNTIME_DIR", str(root / ".cache/jupyter"))
-path = root / "notebooks/01_data_understanding.ipynb"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("notebook", nargs="?", default="notebooks/01_data_understanding.ipynb")
+args = parser.parse_args()
+path = root / args.notebook
 notebook = nbformat.read(path, as_version=4)
 # Register inside .venv so interactive Jupyter selects the same interpreter.
 install(prefix=sys.prefix, kernel_name="readmit-iq", display_name="Python 3 (ReadmitIQ .venv)")
