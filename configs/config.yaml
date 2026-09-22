@@ -1,0 +1,90 @@
+# Source cohort bounds and count semantics; no empirical outlier cutoffs.
+random_seed: 42
+raw_dir: data/raw
+report_dir: reports/data_quality
+dataset:
+  name: Diabetes 130-US Hospitals for Years 1999-2008
+  source_url: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
+  archive_url: https://archive.ics.uci.edu/static/public/296/diabetes+130-us+hospitals+for+years+1999-2008.zip
+  archive_sha256: f82ac129da2ddd2299391ff6fbae3a6a58b3edcf59ac9d7bd480c00fe453112a
+  metadata_url: https://archive.ics.uci.edu/api/dataset?id=296
+  expected_rows: 101766
+  expected_columns:
+  - encounter_id
+  - patient_nbr
+  - race
+  - gender
+  - age
+  - weight
+  - admission_type_id
+  - discharge_disposition_id
+  - admission_source_id
+  - time_in_hospital
+  - payer_code
+  - medical_specialty
+  - num_lab_procedures
+  - num_procedures
+  - num_medications
+  - number_outpatient
+  - number_emergency
+  - number_inpatient
+  - diag_1
+  - diag_2
+  - diag_3
+  - number_diagnoses
+  - max_glu_serum
+  - A1Cresult
+  - metformin
+  - repaglinide
+  - nateglinide
+  - chlorpropamide
+  - glimepiride
+  - acetohexamide
+  - glipizide
+  - glyburide
+  - tolbutamide
+  - pioglitazone
+  - rosiglitazone
+  - acarbose
+  - miglitol
+  - troglitazone
+  - tolazamide
+  - examide
+  - citoglipton
+  - insulin
+  - glyburide-metformin
+  - glipizide-metformin
+  - glimepiride-pioglitazone
+  - metformin-rosiglitazone
+  - metformin-pioglitazone
+  - change
+  - diabetesMed
+  - readmitted
+  file_sha256:
+    diabetic_data.csv: 0689e7ec031237dc63031b938805c48377748761a3b26acab621567afa24df97
+    IDS_mapping.csv: f1bb82b471cb34649352597572c9b1fb00bd27f77b9f5a22a03dc3eb1039749e
+numeric_bounds:
+  time_in_hospital:
+  - 1
+  - 14
+  num_lab_procedures:
+  - 1
+  - null
+  num_procedures:
+  - 0
+  - null
+  num_medications:
+  - 1
+  - null
+  number_outpatient:
+  - 0
+  - null
+  number_emergency:
+  - 0
+  - null
+  number_inpatient:
+  - 0
+  - null
+  number_diagnoses:
+  - 1
+  - null

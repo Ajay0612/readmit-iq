@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "readmit-iq"
+version = "0.1.0"
+description = "Hospital readmission analytics: reproducible data ingestion and inspection"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=2,<3", "pandas>=2.2,<4", "scikit-learn>=1.5,<2",
+  "matplotlib>=3.9,<4", "PyYAML>=6,<7", "pydantic>=2,<3",
+  "requests>=2.32,<3", "joblib>=1.4,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "jupyterlab>=4,<5", "ipykernel>=6,<8", "nbclient>=0.10,<1",
+  "nbformat>=5,<6", "pytest>=8,<10", "ruff>=0.12,<1",
+  "pre-commit>=4,<5", "pip-tools>=7,<8",
+]
+# Reserved for later phases; these extras are not installed or validated in Phase 1.
+modeling = [
+  "xgboost>=2", "lightgbm>=4", "catboost>=1.2", "imbalanced-learn>=0.13",
+  "shap>=0.46", "optuna>=4", "mlflow>=2.17",
+]
+api = ["fastapi>=0.115", "uvicorn>=0.30"]
+demo = ["streamlit>=1.40"]
+
+[project.scripts]
+readmit-download = "readmit_iq.data.download:main"
+readmit-inspect = "readmit_iq.data.inspect:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
