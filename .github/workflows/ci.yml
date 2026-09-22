@@ -1,4 +1,4 @@
-name: Data and EDA checks
+name: Data and baseline checks
 
 on:
   push:
@@ -25,5 +25,7 @@ jobs:
         run: make install
       - name: Download and verify the public source
         run: make download inspect
-      - name: Execute EDA, verify environment, lint and test
-        run: make phase2
+      - name: Execute notebooks, verify environment, lint and test
+        env:
+          LOKY_MAX_CPU_COUNT: "2"
+        run: make notebook eda-notebook phase3
