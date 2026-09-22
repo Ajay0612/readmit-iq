@@ -1,0 +1,11 @@
+comparison,model,reference,ap_difference,ci_low,ci_high
+Logistic vs prevalence,logistic,naive_prevalence,0.0839810809145112,0.0697842853809943,0.101208713828785
+All prior utilization,logistic,logistic_no_utilization,0.03935965244276088,0.026695222812184567,0.05547383008247844
+Add total and any-use indicators,logistic,logistic_raw_utilization,-0.0021274860530994255,-0.005171267285484698,0.0001393117530333193
+Discharge destination,logistic,logistic_no_disposition,0.014288170945476297,0.00782454597169958,0.021243688221305245
+Balanced class weights,logistic_balanced,logistic,-0.0004102752545563082,-0.0013369163734793903,0.0007391250091092873
+Random forest vs logistic,random_forest,logistic,0.003188206193941945,-0.0033660312134314125,0.010636554743090304
+Boosting vs logistic,histogram_boosting,logistic,0.00789734920805979,0.0015395999269828932,0.01433389998719229
+Add grouped diagnoses (uncertain timing),logistic_diagnosis_groups,logistic,0.0016914849001686827,-0.001568161207370692,0.005145919500300732
+Raw vs grouped diagnosis representation,logistic_diagnosis_raw,logistic_diagnosis_groups,0.002344126357079701,-0.005792962961766095,0.010135296265993748
+Add encounter summaries (uncertain timing),logistic_encounter_summaries,logistic,0.0004069099647842078,-0.002416206375493726,0.003357918581738294

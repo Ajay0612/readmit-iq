@@ -1,0 +1,49 @@
+{
+  "phase": 3,
+  "notebook_code_cells_executed": 10,
+  "notebook_error_outputs": 0,
+  "model_artifacts_reloaded_and_predictions_matched": 11,
+  "validation_metrics_independently_recomputed": true,
+  "preprocessing_fit_rows_verified": 63563,
+  "source_and_frozen_partition_hashes_verified": true,
+  "patient_overlap": {
+    "train_validation": 0,
+    "train_test": 0,
+    "validation_test": 0
+  },
+  "all_90702_encounters_and_65044_patients_accounted_for": true,
+  "test_records_opened_by_verification": false,
+  "test_evaluated": false,
+  "no_convergence_or_training_warnings": true,
+  "figures_visually_reviewed": [
+    "01_model_comparison.png",
+    "02_precision_recall.png",
+    "03_initial_calibration.png",
+    "04_utilization_ablation.png"
+  ],
+  "embedded_notebook_images_match_saved_figures": true,
+  "figure_sha256": {
+    "01_model_comparison.png": "c13de8765cc42f8d9bf954a780c82823bb5bcf724206e2b0d48f7623ef5db7c3",
+    "02_precision_recall.png": "f5b152e53345806060683f0dca685f3df9bacfa1c6152e814e588988e836021a",
+    "03_initial_calibration.png": "76f66438329df5ce65e939e1ee63829ab62075ee35581ebe246eabb19f488680",
+    "04_utilization_ablation.png": "ef49214c4b7c4963326fd63932260d6fd14660b246bf571d42429fc7144c4428"
+  },
+  "development_model_sha256": {
+    "histogram_boosting.joblib": "29e761b4b92f6adc5d1b9a615e69f7c7dff0b11fb05a21afa026ee4adc482701",
+    "logistic_diagnosis_raw.joblib": "1f8bc385082fddd88f34f3bd3e2da225c688cd989b9b4b5067c9fab96d11f8f2",
+    "random_forest.joblib": "073c7891611da9692242531045e3a33afbb36689d42f8f3a18f2f18d78f51bca",
+    "logistic_raw_utilization.joblib": "4ed93464f414bc0e0808f30fc5e5bde1b0d703427fdaf9d13a091205465c75e8",
+    "logistic_diagnosis_groups.joblib": "1844e1064c016b59c63a647598ab041463f3428395332cb135d5d826b59b6210",
+    "logistic_encounter_summaries.joblib": "237caaa8b5ddf5cc04daaaa540f66997607da70d4329c61109871d65890f5634",
+    "logistic.joblib": "d5f71cd4663e61ffa85a3e0df631ca7c05355b129de59ad49c23a1754cc3082d",
+    "logistic_balanced.joblib": "af362239a1688485188bacedc79719670e088e4dccac1fa13f122dd8f637ce7e",
+    "logistic_no_disposition.joblib": "e1276a7cfc5836ab5586f9ab2f824b7d4f172a7e65fa69796693e6cac2342449",
+    "logistic_no_utilization.joblib": "2484a0055ad8d2890a24c028ad3ba696fd5f14b6d6b13a717551db30ee41a5e3",
+    "naive_prevalence.joblib": "75515371c953746bee9fcbd7d186debdb0e31d69495aff243c373b12640b506e"
+  },
+  "local_links_verified": 31,
+  "test_suite": "93 passed (38 existing + 55 new)",
+  "lint": "ruff check and format --check passed",
+  "environment": "virtualenv/import checks passed; pip check found no broken requirements",
+  "remote": "No GitHub remote configured; CI not remotely executed"
+}

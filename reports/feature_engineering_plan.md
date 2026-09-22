@@ -1,5 +1,8 @@
 # Preliminary feature-engineering plan
 
+Historical Phase 2 discovery plan. See the [Phase 3 ablation evidence](modeling/baseline_model_report.md)
+for what was implemented and what did or did not improve validation performance.
+
 Discovery only. No final engineered predictors, fitted preprocessing or models exist. Evidence
 uses the 90,702-encounter primary cohort. EDA display bands are not validated prediction thresholds.
 

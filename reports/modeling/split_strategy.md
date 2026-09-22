@@ -1,4 +1,8 @@
-# Patient-grouped split design (not executed)
+# Phase 2 patient-grouped split design
+
+Historical design, now implemented in Phase 3. See the
+[frozen split report](data_split_report.md) and [manifest](split_manifest.json) for actual assignments
+and diagnostics. Statements below describe the Phase 2 state before partition creation.
 
 Recommend **70% train / 15% validation / 15% test by unique patient**, using seed **42**
 from `configs/config.yaml`. Every eligible encounter for a patient follows that patient's

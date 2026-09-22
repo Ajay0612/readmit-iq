@@ -1,0 +1,28 @@
+{
+  "figures": [
+    "01_model_comparison.png",
+    "02_precision_recall.png",
+    "03_initial_calibration.png",
+    "04_utilization_ablation.png"
+  ],
+  "calibration_descriptive": [
+    {
+      "model": "histogram_boosting",
+      "quantile_ece": 0.006416402165258866
+    },
+    {
+      "model": "logistic",
+      "quantile_ece": 0.009625624374946773
+    },
+    {
+      "model": "logistic_balanced",
+      "quantile_ece": 0.3549822064914461
+    },
+    {
+      "model": "random_forest",
+      "quantile_ece": 0.006500843190463915
+    }
+  ],
+  "test_evaluated": false,
+  "development_winner": "histogram_boosting"
+}

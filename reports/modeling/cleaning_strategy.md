@@ -1,5 +1,8 @@
 # Cleaning and preprocessing contract for Phase 3
 
+This records the Phase 2 plan. The implemented Phase 3 allowlist and transformations are in the
+[scoring contract](scoring_time_contract.md) and [feature manifest](model_feature_manifest.md).
+
 Only fixed eligibility, literal `? → missing` normalization, and the validated binary outcome
 have been applied to a copied table. Raw files remain checksum-verified and untouched. Source
 outcome and identifiers remain for audit; no learned preprocessing exists.
