@@ -37,6 +37,6 @@ client = NotebookClient(
     km=manager,
     resources={"metadata": {"path": str(root)}},
 )
-client.execute()
+client.execute(cleanup_kc=True)
 nbformat.write(notebook, path)
 print(f"Executed {sum(cell.cell_type == 'code' for cell in notebook.cells)} code cells")

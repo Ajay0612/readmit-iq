@@ -11,5 +11,6 @@
   "fresh_network_download": "archive and both CSV SHA-256 checks passed",
   "independent_csv_reconciliation": "row, patient, target, duplicate-ID, and missing-marker counts matched",
   "phase2_started": false,
-  "remote_ci": "configured, not run; no GitHub remote"
+  "remote_ci": "configured, not run; no GitHub remote",
+  "notebook_kernel_cleanup": "Explicit cleanup verified in a second successful notebook execution"
 }
