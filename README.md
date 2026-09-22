@@ -244,10 +244,14 @@ After modifying source modules, reinstall with `python -m pip install --no-deps 
 Run commands from the repository root, or set `READMITIQ_CONFIG` to the YAML file's full path.
 APIs and future notebooks are not scaffolded.
 Docker, advanced ML dependencies and service CI will be added when those phases begin.
-Local Git is initialized on `main`; no GitHub remote is configured. The planned remote name
-is `readmit-iq`, to be connected when the user creates it.
-The GitHub Actions workflow executes all three notebooks, lint and tests on Python 3.12.
-It is configured but cannot run remotely until a GitHub repository is connected and pushed.
+The GitHub repository is [Ajay0612/readmit-iq](https://github.com/Ajay0612/readmit-iq),
+with `main` as the development branch and `origin` as the local remote.
+Only project source, configuration, tests, documentation, executed notebooks, aggregate reports
+and figures are versioned; downloaded data, processed partitions, development models and local
+environment files stay outside Git.
+The GitHub Actions workflow executes all three notebooks, lint and tests on Python 3.12
+for pushes and pull requests. See [workflow runs](https://github.com/Ajay0612/readmit-iq/actions)
+for remote execution status. Earlier verification reports describe their original execution state.
 
 ## Phase 4, pending authorization
 
