@@ -1,0 +1,33 @@
+phase: 3
+random_seed: 42
+split:
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+  prevalence_tolerance: 0.01
+  directory: data/processed/phase3
+  lock_report: reports/modeling/split_manifest.json
+modeling:
+  report_dir: reports/modeling
+  figure_dir: reports/figures/modeling
+  artifact_dir: models/development
+  threshold: 0.50
+  rare_min_count: 100
+  threads: 2
+  bootstrap_replicates: 300
+  # Fixed first-pass settings, chosen before validation results. No searches.
+  logistic: {C: 1.0, solver: lbfgs, max_iter: 1500, tol: 0.0001}
+  forest: {n_estimators: 200, max_depth: 12, min_samples_leaf: 20, max_features: sqrt, n_jobs: 2}
+  boosting: {max_iter: 150, learning_rate: 0.05, max_leaf_nodes: 15, min_samples_leaf: 30, l2_regularization: 1.0, early_stopping: false}
+experiments:
+  - {name: naive_prevalence, family: dummy, variant: primary, role: baseline}
+  - {name: logistic, family: logistic, variant: primary, role: primary}
+  - {name: logistic_balanced, family: logistic, variant: primary, role: primary, class_weight: balanced}
+  - {name: random_forest, family: forest, variant: primary, role: primary}
+  - {name: histogram_boosting, family: boosting, variant: primary, role: primary}
+  - {name: logistic_no_utilization, family: logistic, variant: no_utilization, role: ablation}
+  - {name: logistic_raw_utilization, family: logistic, variant: raw_utilization, role: ablation}
+  - {name: logistic_no_disposition, family: logistic, variant: no_disposition, role: ablation}
+  - {name: logistic_diagnosis_groups, family: logistic, variant: diagnosis_groups, role: sensitivity}
+  - {name: logistic_diagnosis_raw, family: logistic, variant: diagnosis_raw, role: sensitivity}
+  - {name: logistic_encounter_summaries, family: logistic, variant: encounter_summaries, role: sensitivity}

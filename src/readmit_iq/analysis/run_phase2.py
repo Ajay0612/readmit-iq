@@ -44,6 +44,10 @@ def main() -> None:
     configure_logging()
     source = load_config()
     root = source.raw_dir.parent.parent
+    if (root / "data/processed/phase3/lock.json").exists():
+        raise RuntimeError(
+            "Phase 3 test is frozen. Use archived Phase 2 outputs; do not rerun full-cohort EDA."
+        )
     policy = load_phase2_config(root / "configs/phase2.yaml")
     output = root / policy["eda"]["report_dir"]
     figures = root / policy["eda"]["figure_dir"]

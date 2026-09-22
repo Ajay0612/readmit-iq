@@ -1,0 +1,66 @@
+{
+  "created_at_utc": "2026-09-22T14:29:05.326155+00:00",
+  "seed": 42,
+  "method": "Sorted unique patients; any-positive x capped encounter-count strata; two stratified splits",
+  "split_policy": {
+    "train_fraction": 0.7,
+    "validation_fraction": 0.15,
+    "test_fraction": 0.15,
+    "prevalence_tolerance": 0.01,
+    "directory": "data/processed/phase3",
+    "lock_report": "reports/modeling/split_manifest.json"
+  },
+  "provenance": {
+    "source_sha256": {
+      "diabetic_data.csv": "0689e7ec031237dc63031b938805c48377748761a3b26acab621567afa24df97",
+      "IDS_mapping.csv": "f1bb82b471cb34649352597572c9b1fb00bd27f77b9f5a22a03dc3eb1039749e"
+    },
+    "cohort_policy_sha256": "cd122f1dd95658b80caca50b26fff278289f393afb7a7df0d9944e149919bedf"
+  },
+  "partitions": [
+    {
+      "partition": "train",
+      "encounters": 63563,
+      "patients": 45530,
+      "positives": 7068,
+      "negatives": 56495,
+      "prevalence_pct": 11.119676541384138,
+      "encounter_pct": 70.07893982492116,
+      "patient_pct": 69.99877006334174
+    },
+    {
+      "partition": "validation",
+      "encounters": 13590,
+      "patients": 9757,
+      "positives": 1499,
+      "negatives": 12091,
+      "prevalence_pct": 11.030169242089771,
+      "encounter_pct": 14.983131573724945,
+      "patient_pct": 15.000614968329131
+    },
+    {
+      "partition": "test",
+      "encounters": 13549,
+      "patients": 9757,
+      "positives": 1487,
+      "negatives": 12062,
+      "prevalence_pct": 10.974979703299137,
+      "encounter_pct": 14.937928601353883,
+      "patient_pct": 15.000614968329131
+    }
+  ],
+  "patient_overlap": {
+    "train_validation": 0,
+    "train_test": 0,
+    "validation_test": 0
+  },
+  "eligible_encounters": 90702,
+  "eligible_patients": 65044,
+  "files": {
+    "assignments.csv.gz": "11b732c0865bb1e52e404c0d3b2896682d0685ef931f7d43badc9647ceae183a",
+    "test.csv.gz": "04816664930093cf38b0c2dee1caaeb4097272bbc861a6c1d5521022c964583c",
+    "train.csv.gz": "571d8111634552bbc314eaa227ef4ab4db72edfa6f51b26c2cbda2328ebd9b51",
+    "validation.csv.gz": "1eaea4186167bade6d37eb7e48e539551e0b960879501c44adf938c3595d1574"
+  },
+  "test_status": "LOCKED: aggregate split diagnostics only; no test predictions or development EDA"
+}
