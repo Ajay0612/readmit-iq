@@ -33,3 +33,13 @@ jobs:
         env:
           LOKY_MAX_CPU_COUNT: "2"
         run: make phase3
+      - name: Show aggregate model diagnostics on failure
+        if: failure()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for name in ("baseline_model_results.csv", "feature_ablation_results.csv"):
+              path = Path("reports/modeling") / name
+              if path.exists():
+                  print(f"\n{name}\n{path.read_text()}")
+          PY
