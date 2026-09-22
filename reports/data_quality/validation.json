@@ -1,0 +1,102 @@
+{
+  "passed": true,
+  "errors": [],
+  "duplicate_rows": 0,
+  "duplicate_encounter_ids": 0,
+  "invalid_numeric_counts": {
+    "time_in_hospital": 0,
+    "num_lab_procedures": 0,
+    "num_procedures": 0,
+    "num_medications": 0,
+    "number_outpatient": 0,
+    "number_emergency": 0,
+    "number_inpatient": 0,
+    "number_diagnoses": 0
+  },
+  "invalid_age_bands": 0,
+  "unmapped_codes": {
+    "admission_type_id": [],
+    "discharge_disposition_id": [],
+    "admission_source_id": []
+  },
+  "coded_unknowns": {
+    "admission_type_id": {
+      "5": {
+        "description": "Not Available",
+        "count": 4785
+      },
+      "6": {
+        "description": "NULL",
+        "count": 5291
+      },
+      "8": {
+        "description": "Not Mapped",
+        "count": 320
+      }
+    },
+    "discharge_disposition_id": {
+      "18": {
+        "description": "NULL",
+        "count": 3691
+      },
+      "25": {
+        "description": "Not Mapped",
+        "count": 989
+      },
+      "26": {
+        "description": "Unknown/Invalid",
+        "count": 0
+      }
+    },
+    "admission_source_id": {
+      "9": {
+        "description": "Not Available",
+        "count": 125
+      },
+      "15": {
+        "description": "Not Available",
+        "count": 0
+      },
+      "17": {
+        "description": "NULL",
+        "count": 6781
+      },
+      "20": {
+        "description": "Not Mapped",
+        "count": 161
+      },
+      "21": {
+        "description": "Unknown/Invalid",
+        "count": 0
+      }
+    }
+  },
+  "unknown_invalid_gender": 3,
+  "death_or_hospice_dispositions": {
+    "11": {
+      "description": "Expired",
+      "count": 1642
+    },
+    "13": {
+      "description": "Hospice / home",
+      "count": 399
+    },
+    "14": {
+      "description": "Hospice / medical facility",
+      "count": 372
+    },
+    "19": {
+      "description": "Expired at home. Medicaid only, hospice.",
+      "count": 8
+    },
+    "20": {
+      "description": "Expired in a medical facility. Medicaid only, hospice.",
+      "count": 2
+    },
+    "21": {
+      "description": "Expired, place unknown. Medicaid only, hospice.",
+      "count": 0
+    }
+  },
+  "scope": "Structural/source bounds only; no clinical plausibility certification"
+}

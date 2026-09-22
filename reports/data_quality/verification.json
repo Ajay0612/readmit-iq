@@ -1,0 +1,15 @@
+{
+  "verified_utc": "2026-09-22T00:47:12.292689+00:00",
+  "command": "make phase1",
+  "exit_code": 0,
+  "pytest_passed": 14,
+  "notebook_executed_code_cells": 5,
+  "notebook_errors": 0,
+  "ruff_check": "passed",
+  "ruff_format": "passed",
+  "pip_check": "No broken requirements found",
+  "fresh_network_download": "archive and both CSV SHA-256 checks passed",
+  "independent_csv_reconciliation": "row, patient, target, duplicate-ID, and missing-marker counts matched",
+  "phase2_started": false,
+  "remote_ci": "configured, not run; no GitHub remote"
+}

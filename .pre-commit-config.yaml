@@ -11,4 +11,3 @@ repos:
         entry: .venv/bin/ruff format --check
         language: system
         types: [python]
-

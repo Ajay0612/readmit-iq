@@ -1,0 +1,29 @@
+name: Phase 1 checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  data-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Create environment
+        run: python -m venv .venv
+      - name: Install Phase 1 dependencies
+        run: make install
+      - name: Lint and test without downloading patient records
+        run: make lint test
+      - name: Download and verify the public source
+        run: make download inspect verify

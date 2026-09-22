@@ -23,4 +23,3 @@ mlartifacts/
 !/data/processed/.gitkeep
 /models/*
 !/models/.gitkeep
-
