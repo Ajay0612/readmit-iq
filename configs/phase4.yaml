@@ -1,0 +1,49 @@
+phase: 4
+random_seed: 42
+threads: 2
+report_dir: reports/modeling/phase4
+artifact_dir: models/development/phase4
+figure_dir: reports/figures/modeling/phase4
+tracking_dir: mlruns/phase4
+experiment_name: ReadmitIQ-Phase4
+cv:
+  folds: 5
+  prevalence_tolerance: 0.01
+features:
+  allowed: [raw, indicators, raw_engineered]
+  sensitivity_only: [diagnosis_grouped, diagnosis_raw]
+  preference: [raw, indicators, raw_engineered]
+  minimum_ap_gain: 0.001
+  rare_min_count: 100
+tuning:
+  logistic:
+    trials: 30
+    minimum_trials: 15
+    plateau_patience: 10
+    C: [0.001, 100.0]
+  boosting:
+    trials: 50
+    minimum_trials: 25
+    plateau_patience: 15
+    learning_rate: [0.025, 0.15]
+    max_iter: [75, 125, 150, 200, 300]
+    max_leaf_nodes: [7, 15, 31]
+    min_samples_leaf: [20, 30, 50, 100, 200]
+    l2_regularization: [0.0, 0.1, 1.0, 10.0, 30.0]
+  plateau_minimum_improvement: 0.0002
+calibration:
+  methods: [uncalibrated, sigmoid, isotonic]
+  minimum_brier_improvement: 0.0001
+  maximum_ap_loss: 0.001
+selection:
+  minimum_boosting_ap_gain: 0.005
+  maximum_brier_disadvantage: 0.0002
+  maximum_sd_ratio: 2.0
+evaluation:
+  bootstrap_replicates: 1000
+  threshold_step: 0.01
+  subgroup_threshold: 0.10
+  subgroup_min_encounters: 200
+  subgroup_min_positives: 30
+  inference_batch_size: 1024
+  inference_repeats: 7
