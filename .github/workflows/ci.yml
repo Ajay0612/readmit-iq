@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0  # Verify that the final protocol commit follows its frozen code commit.
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -51,6 +52,26 @@ jobs:
             reports/modeling/model_selection_report.md
             reports/modeling/phase5_recommendation.md
             reports/figures/modeling/phase4/
+      - name: Reproduce validation explanations and verify archived final evaluation
+        env:
+          LOKY_MAX_CPU_COUNT: "2"
+          MPLBACKEND: Agg
+          NUMBA_CACHE_DIR: .cache/numba
+        # Never run make final-eval here: the real test prediction pass is not repeated.
+        run: make phase5
+      - name: Preserve aggregate Phase 5 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase5-final-evidence
+          retention-days: 7
+          path: |
+            notebooks/05_explainability_business_impact.ipynb
+            notebooks/06_final_test_evaluation.ipynb
+            reports/modeling/phase5/
+            reports/modeling/final_evaluation_protocol.md
+            reports/modeling/final_model_specification.json
+            reports/modeling/final_model_metadata.json
+            reports/figures/phase5/
       - name: Show aggregate model diagnostics on failure
         if: failure()
         run: |

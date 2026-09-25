@@ -1,0 +1,44 @@
+{
+  "inputs": {
+    "implementation_sha256": "061219d3f6af0b7cb789aea6afa7673875dea5e79bfe0d362ab5c836b3d810e4",
+    "validation_prediction_sha256": "a1391f2383c7f7dfb7d0599ae98ba77d8bfe88d58fb10f408e849787cd942931",
+    "settings": {
+      "background_rows": 128,
+      "comparison_rows": 256,
+      "permutation_repeats": 8,
+      "units": "log_odds",
+      "categorical_references": {
+        "age": "[50-60)",
+        "gender": "Female",
+        "admission_type_id": "1",
+        "admission_source_id": "7",
+        "discharge_disposition_id": "1",
+        "medical_specialty": "InternalMedicine"
+      },
+      "cases": [
+        "targeted_positive",
+        "targeted_negative",
+        "missed_positive_no_prior_inpatient"
+      ]
+    },
+    "models": {
+      "logistic__uncalibrated": "ff82996f1f49008dec373655d53cf95a2ce5d940cb7dbc2bd1e25ea6fe447fa8",
+      "boosting__uncalibrated": "66ac3b086a0092a6c45e27c50888edda10a429550751a3074e8e99f063c8c8b0"
+    }
+  },
+  "logistic_maximum_additivity_error": 1.1102230246251565e-15,
+  "boosting_maximum_additivity_error": 7.993605777301127e-15,
+  "tree_adapter_check": {
+    "accepted": false,
+    "maximum_log_odds_error": 2.539238810418192,
+    "rows_checked": 32
+  },
+  "linear_method": "LinearExplainer, independent training background, grouped one-hot sums",
+  "boosting_method": "PermutationExplainer of actual categorical decision_function",
+  "logistic_rows": 13590,
+  "boosting_rows": 256,
+  "background_rows": 128,
+  "units": "log odds",
+  "partition": "validation",
+  "test_accessed": false
+}

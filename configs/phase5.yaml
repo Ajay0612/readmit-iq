@@ -1,0 +1,50 @@
+phase: 5
+random_seed: 42
+threads: 2
+primary: logistic__uncalibrated
+challenger: boosting__uncalibrated
+feature_configuration: raw
+report_dir: reports/modeling/phase5
+artifact_dir: models/development/phase5
+figure_dir: reports/figures/phase5
+targeting:
+  type: capacity_rank
+  fraction: 0.10
+  capacity_is_assumed: true
+  unit: eligible discharge encounter
+  capacity_rounding: floor
+  tie_break: sha256 of seed colon encounter_id; ascending
+  capacities: [0.05, 0.10, 0.15, 0.20, 0.25]
+  risk_groups: 10
+  scenario_encounters: 10000
+  illustrative_thresholds: [0.05, 0.10, 0.15, 0.169407, 0.20, 0.25, 0.30, 0.50]
+uncertainty:
+  bootstrap_replicates: 1000
+  confidence: 0.95
+  bootstrap_policy: rerank weighted resampled encounters at the frozen capacity
+subgroups:
+  minimum_encounters: 200
+  minimum_patients: 100
+  minimum_positives: 30
+  minimum_negatives: 30
+  material_probability_bias: 0.02
+  groups: [prior_inpatient, prior_inpatient_high, prior_emergency, age, gender, race, length_of_stay, discharge_destination, admission_type, admission_source, specialty_missing, payer_missing]
+explanations:
+  background_rows: 128
+  comparison_rows: 256
+  permutation_repeats: 8
+  units: log_odds
+  categorical_references:
+    age: '[50-60)'
+    gender: Female
+    admission_type_id: '1'
+    admission_source_id: '7'
+    discharge_disposition_id: '1'
+    medical_specialty: InternalMedicine
+  cases: [targeted_positive, targeted_negative, missed_positive_no_prior_inpatient]
+final_test:
+  models: [logistic__uncalibrated, boosting__uncalibrated]
+  primary_metrics: [average_precision, roc_auc, brier, recall, precision, lift]
+  allow_retuning: false
+  allow_calibration_change: false
+  allow_policy_change: false

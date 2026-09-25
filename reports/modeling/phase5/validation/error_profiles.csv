@@ -1,0 +1,11 @@
+cohort,encounters,patients,mean_probability,median_stay,no_prior_inpatient_fraction,no_prior_emergency_fraction,model,partition
+all_readmissions,1499,1190,0.139314757187479,4.0,0.5196797865243495,0.8425617078052035,logistic__uncalibrated,validation
+false_negative,1178,1038,0.10358226617303622,4.0,0.6213921901528013,0.8582342954159593,logistic__uncalibrated,validation
+false_positive,1038,755,0.24260641098364769,5.0,0.151252408477842,0.7186897880539499,logistic__uncalibrated,validation
+low_utilization_false_negative,732,725,0.09172349956980347,4.0,1.0,0.9153005464480874,logistic__uncalibrated,validation
+low_utilization_true_positive,47,47,0.23888533556829636,4.0,1.0,0.9787234042553191,logistic__uncalibrated,validation
+all_readmissions,1499,1190,0.14074923535361275,4.0,0.5196797865243495,0.8425617078052035,boosting__uncalibrated,validation
+false_negative,1163,1038,0.10871889949008097,4.0,0.6311263972484953,0.8761822871883062,boosting__uncalibrated,validation
+false_positive,1023,711,0.2378238337365813,4.0,0.11925708699902249,0.6490713587487781,boosting__uncalibrated,validation
+low_utilization_false_negative,734,727,0.09151794606415041,4.0,1.0,0.9155313351498637,boosting__uncalibrated,validation
+low_utilization_true_positive,45,45,0.27319021373315294,4.0,1.0,0.9777777777777777,boosting__uncalibrated,validation

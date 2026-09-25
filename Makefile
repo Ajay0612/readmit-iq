@@ -3,6 +3,7 @@ RUFF = .venv/bin/ruff
 
 .PHONY: install download inspect notebook verify test lint phase1 eda eda-notebook phase2 split baselines baseline-notebook phase3
 .PHONY: optimize optimization-reports optimization-notebook phase4
+.PHONY: phase5-development final-eval final-notebook phase5
 install:
 	$(PYTHON) -m pip install -r requirements.txt
 	$(PYTHON) -m pip install --no-deps --no-build-isolation .
@@ -44,3 +45,13 @@ optimization-notebook:
 phase4: optimization-notebook verify lint
 	$(PYTHON) -m pytest --junitxml=.cache/phase4-tests.xml
 	$(PYTHON) scripts/verify_phase4.py
+phase5-development:
+	$(PYTHON) scripts/execute_notebook.py notebooks/05_explainability_business_impact.ipynb --timeout 1800
+# Explicit one-time command; intentionally never a dependency of phase5 or CI.
+final-eval:
+	$(PYTHON) -m readmit_iq.decision_support.final_evaluation --execute-frozen-test
+final-notebook:
+	$(PYTHON) scripts/execute_notebook.py notebooks/06_final_test_evaluation.ipynb --timeout 300
+phase5: phase5-development final-notebook verify lint
+	$(PYTHON) -m pytest --junitxml=.cache/phase5-tests.xml
+	$(PYTHON) scripts/verify_phase5.py
