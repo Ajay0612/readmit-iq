@@ -1,0 +1,31 @@
+{
+  "freeze_sha256": "c573c8c143f3cf3f5b67aeaf245cd3d66e42f65c131e97b97e4a2ec09e235f72",
+  "freeze_commit": "ce2fcdb5c79256f088e82af45d97bb6d51a0360d",
+  "files": {
+    "reports/modeling/phase5/test/summary.json": "d37dcc4eb40c85eb32a476929d083bf150d8e218f62d72e88aa9d444b65d3770",
+    "reports/modeling/phase5/test/logistic__uncalibrated_roc_curve.csv": "3425f1a717661da449c7771fa116619357df5217decc06e97b9e4f0daf3ac44c",
+    "reports/modeling/phase5/test/business_scenario.json": "31e86e1f3ba9f816e388e924a7970c1ba323810ad545797dd08ec161473b0eab",
+    "reports/modeling/phase5/test/calibration.csv": "aef6c0de34f375b249a52086d6a9ebd9d8ae434528f0f27e672a18fe65c37920",
+    "reports/modeling/phase5/test/error_characteristics.csv": "7a1a3bab00b3e35dcb8d1d63e619cc8e451bbc8f7cd7832c01601bbec91974b4",
+    "reports/modeling/phase5/test/metric_intervals.csv": "63c79942d37b3fd7bc9182809c290dd14d1ef583d2106beb215f3990df511c66",
+    "reports/modeling/phase5/test/metrics.csv": "f6b96722b835c4efd99ff20ca461e61406d41016bc981c176282038d4996fd5e",
+    "reports/modeling/phase5/test/logistic__uncalibrated_pr_curve.csv": "8a5d1a12f9a085cc3cc0e208aa04efc9ac124b80f619f3db269bf4f4dd6a2d6e",
+    "reports/modeling/phase5/test/error_profiles.csv": "73034c7eae57f8acb5e65325a0073d3afd83e55bac12ed7dd245b99e3ae5fe85",
+    "reports/modeling/phase5/test/paired_comparisons.csv": "c7d25f4f3937bab892aad95e6374092e7fcf1f372308b56d3579b02f977b1d54",
+    "reports/modeling/phase5/test/boosting__uncalibrated_pr_curve.csv": "0f6f77d6f38a102c8161a6f48c18b34cd6801ee45152a00543a3a3a105487856",
+    "reports/modeling/phase5/test/capacity.csv": "f5a6307b1c4011757526d625dbb8e0105e69f723dc1664894e2ac467b85dae61",
+    "reports/modeling/phase5/test/gains.csv": "5f3a145879fb78d89f407427010e6eb8e5f41083cbad59fb6fc80429c4f321b1",
+    "reports/modeling/phase5/test/risk_deciles.csv": "d98647542866909f96f5253ece75882babb25bfb1ad53ed70abd1b683ef40008",
+    "reports/modeling/phase5/test/subgroups.csv": "026e894d23ea3bdf7fa7c06234ecc0f1c0510347293edbfc317a98d63e57ed03",
+    "reports/modeling/phase5/test/boosting__uncalibrated_roc_curve.csv": "d3b1a6d2fd865650df08548c8ea097a91555c22bd36b74f07aab227a4cefa6d5"
+  },
+  "metadata_sha256": "ecbb6a40b8b7bb27f6d84383c4a4753c576174896fd5aa4cae35b294d2636236",
+  "primary": "logistic__uncalibrated",
+  "targeting_sha256": "3a9134187765c778d15c264e8d0304843e7bec95f79a6e2eda46263d7f00254a",
+  "test_table_loads": 1,
+  "prediction_calls": {
+    "logistic__uncalibrated": 1,
+    "boosting__uncalibrated": 1
+  },
+  "test_refitting_performed": false
+}

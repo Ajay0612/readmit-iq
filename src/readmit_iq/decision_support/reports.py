@@ -397,6 +397,12 @@ The primary remains uncalibrated logistic; the challenger is descriptive, not a 
 
 ## Generalization and uncertainty
 
+Test performance broadly aligns with development: logistic AP is 0.20837 versus validation
+0.19678, ROC-AUC 0.65181 versus 0.65459, and Brier 0.094101 versus 0.095065. The modest AP
+increase is compatible with the reported sampling uncertainty; it is not evidence of a
+new intervention benefit. Policy recall increases from 21.41% to 23.54% and precision from
+23.62% to 25.85%, with the original policy unchanged.
+
 {markdown_table(comparison)}
 
 Training CV AP SD was 0.007680; those reused selection folds do not provide an unbiased
@@ -409,7 +415,11 @@ model; 1,000 paired whole-patient draws, seed 42, rerank the fixed capacity in e
 {markdown_table(metrics[["model", "average_precision", "roc_auc", "brier", "recall", "precision", "specificity", "tp", "fp", "fn", "tn", "lift"]])}
 
 The [paired challenger comparisons](phase5/test/paired_comparisons.csv) use the same patient
-draws. These uncertainty estimates exclude temporal/site shift, retraining and selection.
+draws. Boosting's AP advantage is +0.00474 (95% paired interval −0.00211 to +0.01101).
+Its ROC-AUC and Brier are better, but at the selected capacity it captures 344 readmissions
+versus logistic's 350; the capacity-recall difference is uncertain. These secondary results
+do not reopen the prespecified primary selection. The uncertainty estimates exclude
+ temporal/site shift, retraining and selection.
 Test was isolated from model fitting/tuning; earlier full-cohort EDA means it was not fully
 unseen in the broader analysis. No equivalence or clinical utility conclusion follows.
 
@@ -440,11 +450,30 @@ No prior inpatient history accounts for {int(prior.loc["None", "positives"])}/{i
 readmissions ({prior.loc["None", "positives"] / test.positives:.1%}). Recall is
 **{prior.loc["None", "recall"]:.1%} without prior use** versus
 **{prior.loc["Any", "recall"]:.1%} with prior use**. The low-utilization concern persists.
+The 691 missed low-utilization events are 60.8% of all 1,137 false negatives, involving
+688 historical patients. Of these misses, 60.8% are discharged home, 22.1% to skilled nursing
+and 15.6% with home health; 50.1% have unknown specialty and 35.5% unknown payer.
+Among the 57 captured low-utilization readmissions, 56 have rehabilitation destination 22.
+This reproduces the validation concern about destination and history dependence. Recall
+for 3+ prior inpatient visits is 87.5%, compared with 87.6% on validation.
 These groups use the original cuts and suppression rules; no new test-driven features or
 thresholds follow. [Error profiles](phase5/test/error_profiles.csv) and
 [all error characteristics](phase5/test/error_characteristics.csv) report destinations,
 age, stay, admission context and missingness. The
 [responsible ML report](../responsible_ml.md) applies identical demographic and probability-bias checks.
+
+Test female/male recall is 23.6%/23.5%. African American/Caucasian recall is 23.5%/23.9%,
+so the larger validation racial recall gap does not reproduce descriptively. Cluster
+intervals remain wide; this is not a fairness finding. Hispanic test performance is
+suppressed (14 positive labels), as are Asian, Other and Unknown race performance estimates.
+No supported test group meets the prespecified material mean-bias criterion. Prior-use
+mean risk is 1.21 percentage points below observed prevalence (CI −2.30 to −0.11), while
+no-prior-use mean risk is 0.58 points above (CI 0.02 to 1.14); neither reaches the declared
+2-point magnitude criterion. Do not interpret the absence of flags as proof of calibration.
+
+The highest-risk decile has 350 events and 25.85% observed risk; the lowest has 82 events
+and 6.05% risk. Top two deciles capture 37.66% of events. Lower decile rates are not strictly
+monotonic, and the ranking does not separate a clinically safe low-risk group.
 
 ## Artifacts and repeatability
 

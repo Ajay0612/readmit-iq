@@ -1,24 +1,32 @@
 {
+  "tests_passed": 196,
   "validation_reproduces_phase4": true,
   "original_test_opened_by_verifier": false,
   "model_predictions_by_verifier": 0,
-  "archived_final_verified": false,
+  "archived_final_verified": true,
   "notebooks": {
     "05_explainability_business_impact.ipynb": {
       "code_cells": 8,
       "embedded_images": 8,
+      "image_hashes_match_files": true,
+      "errors": 0
+    },
+    "06_final_test_evaluation.ipynb": {
+      "code_cells": 7,
+      "embedded_images": 8,
+      "image_hashes_match_files": true,
       "errors": 0
     }
   },
   "figure_sha256": {
-    "01_precision_recall.png": "40c7e0a701d226ea52383d4841e94e7c3a83474411af875716cb308a8bc3a788",
-    "02_cumulative_gains.png": "694935d4cdf74308870216b455b6b15f609f0a1dd8a473e17f2b850bc4274bf2",
-    "03_lift_by_capacity.png": "543f58c13a0d3995f95f4fba3e25865106329c7a8e1a9107ec207d61b9ef98b7",
-    "04_operational_scenario.png": "8d0b5b66077f9368f51dc91377f7f93b688e1d9f0bbb50f535ac31128be8cbbd",
+    "01_precision_recall.png": "2923faf293758ea9457410c67e38d5567e3b46dd8614c74ada7292568e295b2c",
+    "02_cumulative_gains.png": "9011e24e47de7941a88acfbbfacbc8dc053379e13e835c5bf4e9678fac941cac",
+    "03_lift_by_capacity.png": "3ef8c516be64bb69c845b50a305fb98bf6ba580c2bd302f5f95a8df47f6a4b52",
+    "04_operational_scenario.png": "fbae1d03f9011c0b247766dbe5e89b7ddd7f00300dec837650aaa6e587c09574",
     "05_global_feature_influence.png": "7da41d482cd16582d5f93862a4f2c6d3402f59232a93b5b3ff2fb51c52d8db36",
     "06_individual_explanations.png": "e3e9975a25c5d305417940d2b3f4360a9dd6edb1dc0514fb99f546b53e8db12d",
-    "07_subgroup_recall.png": "069c75998da2afa1801d67ddb47e7fbd2e6bae09ea1d191d0f78016cdcebe1b8",
-    "08_calibration.png": "2087fe306bb43776723019b6b5fbdba0459e15ee0d13016a2b3cf6633c9ce54e"
+    "07_subgroup_recall.png": "2ba2849ed8009fd3797bcebf34742e31eef7bcdabb102c022e8ed1b09284986a",
+    "08_calibration.png": "6145b93dcdfd5f0e8fd3f449332e571c9ff6b0132d11e5407394af7bb86fb813"
   },
   "checks": "Frozen policy/hash provenance, clustered intervals, totals and suppression"
 }

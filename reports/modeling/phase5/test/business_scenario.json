@@ -1,0 +1,12 @@
+{
+  "scenario": "Illustrative operational scenario; capacity is a portfolio assumption",
+  "eligible_discharges": 10000,
+  "expected_observed_readmissions": 1097.4979703299136,
+  "outreach_encounters": 999.3357443353754,
+  "model_surfaced_readmissions": 258.32164735404825,
+  "random_surfaced_readmissions": 109.6768951086208,
+  "additional_surfaced_readmissions": 148.64475224542747,
+  "number_needed_to_contact": 3.8685714285714288,
+  "prevention_effect_estimated": false,
+  "unique_people_scaled": false
+}

@@ -1,7 +1,10 @@
 """Reconcile Phase 5 evidence without opening test records or invoking real inference."""
 
 import argparse
+import base64
+import hashlib
 import json
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import nbformat
@@ -64,11 +67,29 @@ def main():
         assert not any(output.output_type == "error" for output in outputs)
         assert not any("/Users/ajay/" in str(output) for output in outputs)
         images = sum("image/png" in output.get("data", {}) for output in outputs)
-        assert images >= 8
-        execution[name] = dict(code_cells=len(cells), embedded_images=images, errors=0)
+        assert images == 8
+        image_dir = root / (
+            ".cache/phase5-validation-figures"
+            if name.startswith("05")
+            else "reports/figures/phase5"
+        )
+        embedded = [
+            hashlib.sha256(base64.b64decode(output["data"]["image/png"])).hexdigest()
+            for output in outputs
+            if "image/png" in output.get("data", {})
+        ]
+        assert embedded == [sha256(path) for path in sorted(image_dir.glob("*.png"))]
+        execution[name] = dict(
+            code_cells=len(cells), embedded_images=images, image_hashes_match_files=True, errors=0
+        )
     figures = sorted((root / "reports/figures/phase5").glob("*.png"))
     assert len(figures) == 8 and all(path.stat().st_size > 10000 for path in figures)
+    suites = list(ET.parse(root / ".cache/phase5-tests.xml").getroot().iter("testsuite"))
+    tests = sum(int(suite.attrib["tests"]) for suite in suites)
+    assert tests >= 196
+    assert all(int(suite.attrib[key]) == 0 for suite in suites for key in ["errors", "failures"])
     record = dict(
+        tests_passed=tests,
         validation_reproduces_phase4=True,
         original_test_opened_by_verifier=False,
         model_predictions_by_verifier=0,

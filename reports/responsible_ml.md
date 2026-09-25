@@ -63,6 +63,38 @@ supported group rows. None meet the prespecified joint size/magnitude/interval c
 The [complete table](modeling/phase5/validation/subgroups.csv) includes Brier, bias intervals,
 all predeclared clinical/missingness groups and the challenger's identical diagnostics.
 
+## Test diagnostics, frozen primary
+
+| group | level | encounters | patients | positives | suppressed | prevalence | average_precision | recall | recall_ci_low | recall_ci_high | precision | false_negative_rate | mean_probability |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| prior_inpatient | Any | 4468 | 2852 | 739 | False | 0.1654 | 0.2608 | 0.3965 | 0.3507 | 0.4423 | 0.2552 | 0.6035 | 0.1533 |
+| prior_inpatient | None | 9081 | 8569 | 748 | False | 0.0824 | 0.1347 | 0.0762 | 0.0572 | 0.0952 | 0.2767 | 0.9238 | 0.0882 |
+| prior_inpatient_high | 0–2 | 12679 | 9631 | 1263 | False | 0.0996 | 0.1649 | 0.1219 | 0.1039 | 0.1400 | 0.2508 | 0.8781 | 0.0992 |
+| prior_inpatient_high | 3+ | 870 | 485 | 224 | False | 0.2575 | 0.3643 | 0.8750 | 0.8303 | 0.9197 | 0.2649 | 0.1250 | 0.2624 |
+| age | [0-10) | 24 | 22 | 2 | True | — | — | — | — | — | — | — | — |
+| age | [10-20) | 68 | 59 | 5 | True | — | — | — | — | — | — | — | — |
+| age | [20-30) | 214 | 162 | 25 | True | — | — | — | — | — | — | — | — |
+| age | [30-40) | 525 | 397 | 52 | False | 0.0990 | 0.2785 | 0.3269 | 0.1032 | 0.5507 | 0.3269 | 0.6731 | 0.1146 |
+| age | [40-50) | 1327 | 988 | 119 | False | 0.0897 | 0.1880 | 0.1849 | 0.1092 | 0.2605 | 0.2418 | 0.8151 | 0.0966 |
+| age | [50-60) | 2361 | 1750 | 245 | False | 0.1038 | 0.2860 | 0.2898 | 0.1973 | 0.3823 | 0.3880 | 0.7102 | 0.0975 |
+| age | [60-70) | 3032 | 2239 | 337 | False | 0.1111 | 0.1855 | 0.2047 | 0.1578 | 0.2517 | 0.2447 | 0.7953 | 0.1082 |
+| age | [70-80) | 3441 | 2484 | 417 | False | 0.1212 | 0.2249 | 0.2686 | 0.2120 | 0.3252 | 0.2494 | 0.7314 | 0.1189 |
+| age | [80-90) | 2216 | 1619 | 238 | False | 0.1074 | 0.1594 | 0.2059 | 0.1506 | 0.2611 | 0.1922 | 0.7941 | 0.1197 |
+| age | [90-100) | 341 | 252 | 47 | False | 0.1378 | 0.1841 | 0.1702 | 0.0741 | 0.2663 | 0.2581 | 0.8298 | 0.1129 |
+| gender | Female | 7277 | 5190 | 797 | False | 0.1095 | 0.2012 | 0.2359 | 0.1978 | 0.2740 | 0.2590 | 0.7641 | 0.1091 |
+| gender | Male | 6272 | 4567 | 690 | False | 0.1100 | 0.2187 | 0.2348 | 0.1899 | 0.2797 | 0.2580 | 0.7652 | 0.1103 |
+| race | AfricanAmerican | 2576 | 1745 | 294 | False | 0.1141 | 0.2127 | 0.2347 | 0.1532 | 0.3162 | 0.2323 | 0.7653 | 0.1125 |
+| race | Asian | 66 | 59 | 1 | True | — | — | — | — | — | — | — | — |
+| race | Caucasian | 10155 | 7339 | 1142 | False | 0.1125 | 0.2116 | 0.2391 | 0.2079 | 0.2702 | 0.2698 | 0.7609 | 0.1101 |
+| race | Hispanic | 236 | 196 | 14 | True | — | — | — | — | — | — | — | — |
+| race | Other | 211 | 166 | 20 | True | — | — | — | — | — | — | — | — |
+| race | Unknown | 305 | 278 | 16 | True | — | — | — | — | — | — | — | — |
+
+Material mean probability-bias flags: **0** of 37
+supported group rows. None meet the prespecified joint size/magnitude/interval criterion.
+The [complete table](modeling/phase5/test/subgroups.csv) includes Brier, bias intervals,
+all predeclared clinical/missingness groups and the challenger's identical diagnostics.
+
 ## Why this cannot yet guide clinical deployment
 
 * The selected diabetes inpatient cohort dates to **1999–2008**. Coding, clinical treatment,

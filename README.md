@@ -5,13 +5,76 @@ Predicting hospital readmission risk to help prioritize limited care-management 
 **Business question:** Which patients should a hospital prioritize at discharge for follow-up
 when its care-management team cannot contact everyone?
 
-**Current status: Phase 4 complete.** Training-only patient-grouped optimization and calibration
-comparisons select **uncalibrated logistic regression** as the primary development model, with
-**uncalibrated histogram boosting** as challenger. The final test remains locked and unevaluated.
-No final operational threshold, production model, intervention-impact claim or prediction service
-exists. Model comparisons distinguish training CV from development validation performance.
+**Current status: Phase 5 complete.** The final primary is **uncalibrated logistic regression**,
+with a validation-selected policy to prioritize the **top 10% of eligible discharge encounters**.
+That capacity is an explicit portfolio assumption, not measured hospital staffing. The protocol
+was committed before the one-time final test prediction pass; neither model nor policy changed
+afterward. No prediction service or clinical deployment is implemented.
 
 This is an analytical decision-support portfolio project, not a clinical diagnostic tool.
+
+## Final results and operational interpretation
+
+The eligible cohort contains **90,702 encounters from 65,044 patients**. Patient-grouped
+train/validation/test partitions have **zero patient overlap**. On 13,549 final test encounters:
+
+| Frozen primary metric | Validation | Final test | Test patient-bootstrap 95% interval |
+|---|---:|---:|---:|
+| Average precision | 0.19678 | **0.20837** | 0.18704–0.23285 |
+| ROC-AUC | 0.65459 | **0.65181** | 0.63515–0.66929 |
+| Brier | 0.095065 | **0.094101** | 0.089817–0.098295 |
+| Recall at top 10% | 21.41% | **23.54%** | 21.29–25.91% |
+| Precision at top 10% | 23.62% | **25.85%** | 22.81–28.89% |
+| Lift over random outreach | 2.14× | **2.36×** | 2.13–2.59× |
+
+The policy prioritizes **1,354 encounters from 863 unique historical people**, capturing
+**350 of 1,487 recorded readmissions**, with 1,004 false positives and 1,137 false negatives.
+Unique people are deduplicated historical counts, not simultaneous caseload. Rank scores
+within an available batch, select `floor(10% × N)` and break ties deterministically without
+outcomes. The corresponding probability cutoff varies with the unlabeled batch.
+
+**Illustrative operational result:** per 10,000 eligible discharges, about 1,000 outreach
+encounters surface **258 readmissions versus 110 under random targeting**—about **149 additional
+surfaced events** and 3.87 contacts per surfaced event. This scales retrospective encounter
+yield; it estimates no prevented readmissions, intervention effect or savings.
+
+![Readmissions concentrated in higher-risk discharges](reports/figures/phase5/02_cumulative_gains.png)
+
+**Why logistic?** Boosting's validation AP advantage was only +0.00194, with a paired
+patient-bootstrap interval spanning zero. Logistic retained comparable discrimination with
+simpler interpretation. The final model uses L2/lbfgs, `C=0.09988151348099303`, no class weights,
+seed 42, four original numeric counts/stay features and six categorical discharge-context
+features. Original training-fitted scaling and encoders remain unchanged; no train+validation
+refit or probability recalibration was performed. Exact parameters and preprocessing are in
+the [frozen specification](reports/modeling/final_model_specification.json).
+
+**Strongest drivers:** prior inpatient use and discharge destination, followed by age,
+admission source and specialty. Numeric coefficients use original units; categorical odds
+ratios use explicit within-field contrasts. Linear SHAP and verified actual-booster permutation
+SHAP explain predictive associations, not causes. Three anonymous validation examples show how
+different histories can raise risk and why a low score does not guarantee no readmission.
+
+![Frozen model feature influence](reports/figures/phase5/05_global_feature_influence.png)
+
+**Main limitation:** half of test readmissions have no prior inpatient history. At the frozen
+capacity, their recall is only **7.6%**, versus **39.6%** with prior use. Of the 57 captured
+no-history events, 56 involve rehabilitation destination code 22. Demographic estimates use
+minimum-size rules and patient-cluster intervals; no fairness or subgroup-calibration
+certification is claimed. The historical 1999–2008 diabetes cohort, incomplete outside-hospital
+follow-up, unverified field-arrival times and absent prospective intervention evidence prevent
+direct clinical deployment. Earlier full-cohort EDA exposed eventual test outcomes indirectly;
+this is a held-out model evaluation, not a fully untouched confirmatory study.
+
+Read the [final test report](reports/modeling/final_test_report.md),
+[committed pretest protocol](reports/modeling/final_evaluation_protocol.md),
+[validation policy and capacity tables](reports/modeling/operational_policy_report.md),
+[explanations](reports/modeling/explainability_report.md),
+[deep error analysis](reports/modeling/validation_error_analysis.md),
+[responsible ML report](reports/responsible_ml.md), and executed
+[notebook 05](notebooks/05_explainability_business_impact.ipynb) /
+[notebook 06](notebooks/06_final_test_evaluation.ipynb).
+
+The sections below preserve the earlier development evidence; their metrics are labeled by phase.
 
 ## Data understanding
 
@@ -98,10 +161,10 @@ full-stay treatment/lab summaries remain separate timing-sensitive experiments.
 |---|---:|---:|---:|---:|
 | Train | 63,563 | 45,530 | 7,068 | 11.120% |
 | Validation | 13,590 | 9,757 | 1,499 | 11.030% |
-| Test (locked) | 13,549 | 9,757 | 1,487 | 10.975% |
+| Test (evaluated in Phase 5) | 13,549 | 9,757 | 1,487 | 10.975% |
 
 Every eligible patient and encounter belongs to one partition. Test counts above are the
-allocation diagnostics saved at freeze time, not test performance. Compressed CSV artifacts
+allocation diagnostics saved at freeze time; final performance is reported above. Compressed CSV artifacts
 are ignored by Git; committed hashes ensure deterministic reproduction without adding a
 Parquet dependency. Development loaders reject test access.
 
@@ -132,8 +195,8 @@ more compact than raw coding, but its superiority is not established and timing 
 Boosting's gain over matched logistic is modest: **+0.0079 AP** (0.0015–0.0143). Forest's
 advantage is inconclusive. Balanced weighting raises recall at the reference threshold 0.50,
 but mean predicted risk becomes 46.53% against 11.03% observed, substantially worsening Brier.
-At 0.50, boosting detects only 7 of 1,499 events. An operational outreach threshold has **not**
-been chosen. These are development findings, not a final production-model declaration.
+At 0.50, boosting detects only 7 of 1,499 events. At Phase 3, an operational outreach threshold had **not**
+been chosen. These historical results precede the Phase 5 capacity decision.
 
 Read the [executed baseline notebook](notebooks/03_feature_engineering_and_baselines.ipynb),
 [scoring-time contract](reports/modeling/scoring_time_contract.md),
@@ -203,7 +266,7 @@ not equivalence claims or clinical utility estimates.
 At illustrative logistic thresholds **0.10 / 0.20**, recall is **60.6% / 16.2%**, precision
 **16.3% / 26.8%**, and **41.0% / 6.7%** of validation encounters are flagged. Unique historical
 patients flagged are **3,608 / 588**; they are not a simultaneous outreach caseload. No threshold
-is selected. At 0.10, recall is 35.2% with no prior inpatient use versus 88.2% with any prior use.
+was selected in Phase 4. At 0.10, recall is 35.2% with no prior inpatient use versus 88.2% with any prior use.
 Limited demographic checks retain missingness and suppress small groups; they establish no
 fairness or causal conclusion.
 
@@ -245,6 +308,7 @@ make phase1
 make phase2
 make phase3
 make phase4
+make phase5
 ```
 
 On Windows, activate with `.venv\Scripts\Activate.ps1` and use the equivalent commands:
@@ -262,13 +326,15 @@ python -m pytest --junitxml=.cache/phase4-tests.xml
 python scripts/verify_phase4.py
 ```
 
-For this existing workspace, rerun **`make phase4`** to verify/reuse completed development work.
+For this existing workspace, rerun **`make phase5`** to verify/reuse Phase 5 development and archived final evidence.
+It requires completed Phase 4 caches; `make phase4` still verifies that earlier work.
 `make phase3` remains available for baseline reproduction. Once partitions are frozen,
 full-cohort Phase 2 EDA is blocked; use its archived notebook/reports. Do not delete the lock
 to explore test data. `make split` verifies existing hashes or reconstructs the same assignments
 from verified raw data in a fresh checkout; it refuses silent reallocation or overwrite.
 CI executes source inspection and EDA first, then explicitly runs `make split` before
-`make phase3`, then the complete `make phase4`. Freezing before the EDA notebook would correctly
+`make phase3`, then `make phase4` and `make phase5`. Phase 5 reproduces validation explanations and verifies
+archived final-result hashes; it never repeats real test scoring. Freezing before the EDA notebook would correctly
 trigger the test-access guard.
 The baseline-notebook target also verifies the split as a prerequisite.
 
@@ -283,7 +349,7 @@ Fifteen additional split regression cases cover platform headers, reconstruction
 handling; eleven reporting cases protect reviewed conclusions. The suite had 119 tests at the
 start of Phase 4, which adds 39 cases. Phase 3 reports retain their original execution results.
 
-`requirements.txt` pins the environment used by all four phases. Phase 4 adds Optuna 5.0.0,
+`requirements.txt` pins the environment used by all five phases. Phase 4 adds Optuna 5.0.0,
 MLflow-skinny 3.16.1 and its local SQLite dependencies without changing earlier package pins.
 Platform-only packages use markers.
 Exact pinned versions were tested on Python 3.12/macOS arm64; other Python/platform combinations
@@ -291,8 +357,9 @@ are not verified locally. If a pin is unavailable, resolve `python -m pip instal
 in a fresh environment and record a separate lock instead of silently changing this one.
 `pyproject.toml` declares direct dependencies, optimization extras and future modeling/API/demo
 extras. The broad future extras are deferred and have not been resolved together or tested.
-Phase 3 uses scikit-learn estimators. Phase 4 adds Optuna/local MLflow; no SHAP, SMOTE,
-additional booster package, API or deployment is implemented. Some web packages are transitive
+Phase 3 uses scikit-learn estimators. Phase 4 adds Optuna/local MLflow; Phase 5 adds SHAP
+0.52.0 with slicer/numba/llvmlite without changing earlier pins. No SMOTE, additional booster
+package, API or deployment is implemented. Some web packages are transitive
 MLflow dependencies, not an application service.
 
 Use `make download`, `make inspect`, `make notebook`, `make verify`, `make test`, or `make lint`
@@ -349,19 +416,22 @@ are documented in `.env.example`. The frozen split and estimator seed is 42.
 configs/                     Source/cohort contracts, split, baseline and optimization policies
 data/{raw,interim,processed}/ Verified raw; ignored cohort and compressed frozen partitions
 docs/                        Dataset selection and source dictionary
-notebooks/                   Executed notebooks 01–04
+notebooks/                   Executed notebooks 01–06
 src/readmit_iq/data/          Download, load, validate and inspect modules
 src/readmit_iq/analysis/      Feature audit, patient-cluster statistics, reports and plots
 src/readmit_iq/modeling/      Splits, features, encoders, pipelines, training and validation
 src/readmit_iq/optimization/  Group CV, Optuna, calibration, local tracking and development selection
+src/readmit_iq/decision_support/ Ranking, SHAP, uncertainty, subgroup and frozen final evaluation
 reports/data_quality/        Raw checks, cohort report, feature audit and missingness decisions
 reports/eda/                 Reproducible descriptive tables and summary JSON
 reports/figures/eda/          Seven reviewed EDA figures
 reports/modeling/            Frozen manifest, feature policy and validation results
 reports/figures/modeling/    Four baseline figures plus six Phase 4 figures
+reports/figures/phase5/       Eight reviewed explanation/operational/final-result figures
 scripts/                     Environment verification and notebook execution
 tests/                       Source, cohort, split, feature, encoding and model-pipeline checks
-models/development/          Ignored experimental pipelines and validation predictions
+models/development/          Ignored experimental pipelines and validation/test prediction caches
+models/final/                Ignored byte-identical frozen primary and metadata
 mlruns/phase4/               Ignored local SQLite experiment tracking
 ```
 
@@ -376,15 +446,37 @@ with `main` as the development branch and `origin` as the local remote.
 Only project source, configuration, tests, documentation, executed notebooks, aggregate reports
 and figures are versioned; downloaded data, processed partitions, development models and local
 environment files stay outside Git.
-The GitHub Actions workflow executes all four notebooks, the full bounded search, lint and tests
+The GitHub Actions workflow executes all six notebooks, the full bounded search, lint and tests
 on Python 3.12
 for pushes and pull requests. See [workflow runs](https://github.com/Ajay0612/readmit-iq/actions)
 for remote execution status. Earlier verification reports describe their original execution state.
 
-## Phase 5, pending authorization
+## Reproducing Phase 5 without reopening test
 
-Carry logistic primary and boosting challenger forward under the frozen confirmed-discharge
-contract. Investigate low-utilization errors, subgroup calibration and missingness; verify actual
-field-arrival times. Establish intervention capacity and error costs before selecting a threshold.
-Plan responsible explanations and contemporary external validation. Any final test evaluation
-requires a separately authorized, frozen evaluation plan. No later phase starts automatically.
+`make phase5-development` executes notebook 05 using validation only. `make final-notebook`
+verifies the committed protocol and reviews archived aggregate results. `make phase5` runs
+both notebooks, environment checks, lint, all 196 tests and artifact reconciliation. Notebook
+05 stores its validation figure copies in an ignored cache; it cannot overwrite final figures.
+
+The original explicit **`make final-eval`** command was run once after commit `ce2fcdb` froze
+the decisions. It is deliberately absent from CI and normal reproduction targets. On the
+original workspace, any later analysis reuses hash-verified cached predictions; on a fresh
+checkout containing published results it refuses a new real prediction pass. Do not delete
+locks/caches to rescore. Models and individual predictions remain ignored; the
+[metadata](reports/modeling/final_model_metadata.json) and
+[aggregate publication hashes](reports/modeling/phase5/test/publication_manifest.json) preserve provenance.
+CI checks archived test evidence against its original freeze while reproducing validation on
+Linux; it does not claim to reproduce the original macOS binary bytes.
+
+Phase 5 local verification: **196 tests passed**, Ruff and dependency checks passed, notebook
+05 executed **8 code cells** and notebook 06 **7 code cells**, each with **8 embedded figures**.
+No test record is opened or prediction invoked by the artifact verifier. See the
+[verification record](reports/modeling/phase5/verification.json).
+
+## Phase 6 recommendation
+
+Next, after separate authorization, package the frozen model into a clearly labeled local
+portfolio demonstration with an explicit batch/input contract. Contemporary external and
+prospective clinical/workflow validation remain separate prerequisites for hospital use.
+Read the [Phase 6 recommendation](reports/modeling/phase6_recommendation.md). No API, Streamlit,
+Docker, production architecture, deployment or final resume work starts automatically.

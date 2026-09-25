@@ -82,7 +82,7 @@ def generate_figures(root, destination, include_test=False):
     save(
         fig,
         "01_precision_recall.png",
-        "Logistic · dots: top 10% · aggregate PR grid; precision 100% endpoint outside view",
+        "Logistic · dots: top 10% · aggregate PR grid · view limited to 65% precision",
     )
 
     fig, ax = plt.subplots(figsize=(9, 5.4))
