@@ -1,4 +1,4 @@
-name: Data and baseline checks
+name: Data and development model checks
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 jobs:
   data-contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,6 +33,24 @@ jobs:
         env:
           LOKY_MAX_CPU_COUNT: "2"
         run: make phase3
+      - name: Tune, calibrate and compare development models with patient isolation
+        env:
+          LOKY_MAX_CPU_COUNT: "2"
+          MPLBACKEND: Agg
+        run: make phase4
+      - name: Preserve aggregate Phase 4 reproduction evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-development-evidence
+          retention-days: 7
+          path: |
+            notebooks/04_model_optimization.ipynb
+            reports/modeling/phase4/
+            reports/modeling/tuning_report.md
+            reports/modeling/calibration_report.md
+            reports/modeling/model_selection_report.md
+            reports/modeling/phase5_recommendation.md
+            reports/figures/modeling/phase4/
       - name: Show aggregate model diagnostics on failure
         if: failure()
         run: |
@@ -42,4 +60,8 @@ jobs:
               path = Path("reports/modeling") / name
               if path.exists():
                   print(f"\n{name}\n{path.read_text()}")
+          for name in ("validation_metrics.csv", "paired_comparisons.csv", "selection.json"):
+              path = Path("reports/modeling/phase4") / name
+              if path.exists():
+                  print(f"\nphase4/{name}\n{path.read_text()}")
           PY

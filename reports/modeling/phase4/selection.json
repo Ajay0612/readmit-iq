@@ -1,0 +1,27 @@
+{
+  "primary": "logistic__uncalibrated",
+  "challenger": "boosting__uncalibrated",
+  "boosting_selection_checks": {
+    "validation_ap_gain": false,
+    "paired_ap_interval_positive": false,
+    "brier_acceptable": true,
+    "training_cv_mean": true,
+    "training_cv_stability": true
+  },
+  "operational_threshold_selected": false,
+  "production_model": false,
+  "family_choices": {
+    "logistic": "logistic__uncalibrated",
+    "boosting": "boosting__uncalibrated"
+  },
+  "comparison": {
+    "model": "boosting__uncalibrated",
+    "reference": "logistic__uncalibrated",
+    "ap_difference": 0.0019406614796773913,
+    "brier_difference": -0.0004612480686225634,
+    "ap_ci_low": -0.0042727348330644154,
+    "ap_ci_high": 0.008385434423460804,
+    "brier_ci_low": -0.0008396565810326863,
+    "brier_ci_high": -0.00011596480350573947
+  }
+}

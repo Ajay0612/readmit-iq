@@ -16,6 +16,7 @@ os.environ.setdefault("IPYTHONDIR", str(root / ".cache/ipython"))
 os.environ.setdefault("JUPYTER_RUNTIME_DIR", str(root / ".cache/jupyter"))
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("notebook", nargs="?", default="notebooks/01_data_understanding.ipynb")
+parser.add_argument("--timeout", type=int, default=180, help="Maximum seconds per code cell")
 args = parser.parse_args()
 path = root / args.notebook
 notebook = nbformat.read(path, as_version=4)
@@ -36,7 +37,7 @@ manager.kernel_spec.argv = [
 ]
 client = NotebookClient(
     notebook,
-    timeout=180,
+    timeout=args.timeout,
     kernel_name="readmit-iq",
     km=manager,
     resources={"metadata": {"path": str(root)}},

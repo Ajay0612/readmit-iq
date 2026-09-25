@@ -5,10 +5,11 @@ Predicting hospital readmission risk to help prioritize limited care-management 
 **Business question:** Which patients should a hospital prioritize at discharge for follow-up
 when its care-management team cannot contact everyone?
 
-**Current status: Phase 3 complete.** The repository contains verified ingestion, an explicit
-cohort, executed EDA, frozen patient-grouped partitions and eleven reproducible development
-experiments. The final test remains locked and unevaluated. No final model, tuned threshold,
-calibrator, intervention-impact claim or prediction service exists.
+**Current status: Phase 4 complete.** Training-only patient-grouped optimization and calibration
+comparisons select **uncalibrated logistic regression** as the primary development model, with
+**uncalibrated histogram boosting** as challenger. The final test remains locked and unevaluated.
+No final operational threshold, production model, intervention-impact claim or prediction service
+exists. Model comparisons distinguish training CV from development validation performance.
 
 This is an analytical decision-support portfolio project, not a clinical diagnostic tool.
 
@@ -110,7 +111,7 @@ are learned from training only, with safe unseen-category handling. Numeric coun
 so no numeric imputer is fitted. Diagnosis ranges are centralized and tested; medication-count
 derivations distinguish No from Steady/Up/Down. No future encounter history is fabricated.
 
-**Validation only; fixed first-pass settings:**
+**Phase 3 validation only; fixed first-pass settings:**
 
 | Model | Average precision | ROC-AUC | Brier |
 |---|---:|---:|---:|
@@ -146,6 +147,80 @@ cells executed, and Ruff/environment/dependency checks passed. Four charts were 
 reviewed. Reloading all 11 saved pipelines reproduced their validation predictions and metrics;
 frozen data hashes stayed unchanged. See the [verification record](reports/modeling/phase3_verification.json).
 
+## Phase 4 optimization and development selection
+
+Five `StratifiedGroupKFold` folds use seed 42 and deterministic encounter ordering within the
+63,563 training encounters. Every patient's encounters stay in one fold; all fit/holdout overlaps
+are zero. Preprocessing fits inside training folds. AP is primary because positive prevalence is
+about 11%; a constant-score baseline has AP equal to prevalence. Fold SD describes variability,
+not an independent confidence interval. Feature selection and tuning reuse folds, so selected
+CV scores are optimistic and are not nested-CV performance estimates.
+
+The [protocol](reports/modeling/phase4_protocol.md) and [configuration](configs/phase4.yaml)
+were committed before fitting. Sequential seeded Optuna completed **15 logistic and 30 boosting
+trials**, stopping at the prespecified training-CV plateau. Maximum budgets were 30 and 50.
+Logistic tunes unweighted L2 strength; boosting tunes learning rate, iterations, leaf count,
+minimum leaf size and L2. Random forest is one fixed reference. No SMOTE was used.
+
+| Development candidate | CV AP mean ± SD | Validation AP | Validation ROC-AUC | Validation Brier |
+|---|---:|---:|---:|---:|
+| Logistic — primary | 0.21243 ± 0.00768 | 0.19678 | 0.65459 | 0.095065 |
+| Histogram boosting — challenger | 0.22021 ± 0.00527 | 0.19872 | 0.66149 | 0.094604 |
+| Fixed forest reference | 0.21760 ± 0.00537 | 0.19969 | 0.66023 | 0.094797 |
+
+Both selected families retain **core allowed inputs + raw utilization counts**. Logistic uses
+`C=0.0998815`, L2/lbfgs. Boosting uses `learning_rate=0.0493858`, `max_iter=75`,
+`max_leaf_nodes=15`, `min_samples_leaf=50`, `l2_regularization=30`, `max_bins=255`,
+with internal early stopping disabled. Exact parameters and fold metrics are in the
+[tuning report](reports/modeling/tuning_report.md).
+
+Raw + engineered utilization changed fixed-setting CV AP by −0.00107 for logistic and +0.00097
+for boosting; the latter did not clear the prespecified 0.001 complexity margin. Indicators alone
+lost about 0.026–0.030 AP. Grouped diagnoses improved boosting's training CV AP by about 0.0053;
+raw codes did not. Logistic diagnosis differences were small. Timing remains unverified, so all
+diagnosis experiments stay training-only sensitivities and are ineligible for the primary model.
+
+**Tuning did not materially improve Phase 3 validation performance.** Logistic changed by
++0.00037 AP versus the Phase 3 raw-count reference; boosting changed by −0.00346 versus the
+Phase 3 booster (which used raw + engineered counts). Both paired intervals include zero.
+Parameters were not altered after inspecting validation results.
+
+All seven fitted candidates were sealed before one validation prediction pass. Sigmoid and
+isotonic use training-only cross-fitted calibration with patient-disjoint folds. Logistic isotonic
+improved Brier by 0.000236 but reduced AP by 0.00600; sigmoid's Brier improvement was negligible.
+Neither boosting calibrator qualified. **Both selected models remain uncalibrated** under the
+prespecified Brier-improvement, uncertainty and AP-preservation rule. See the
+[calibration report](reports/modeling/calibration_report.md).
+
+Boosting's validation AP advantage is **+0.00194**, with a 95% paired patient-bootstrap interval
+**[−0.00427, +0.00839]** from 1,000 patient resamples. Its Brier is better, but the AP evidence
+does not clear the prespecified complexity margin. Logistic therefore becomes primary; boosting's
+better CV stability and Brier support retaining it as challenger. These are development choices,
+not equivalence claims or clinical utility estimates.
+
+![Development validation precision-recall curves](reports/figures/modeling/phase4/02_validation_precision_recall.png)
+
+At illustrative logistic thresholds **0.10 / 0.20**, recall is **60.6% / 16.2%**, precision
+**16.3% / 26.8%**, and **41.0% / 6.7%** of validation encounters are flagged. Unique historical
+patients flagged are **3,608 / 588**; they are not a simultaneous outreach caseload. No threshold
+is selected. At 0.10, recall is 35.2% with no prior inpatient use versus 88.2% with any prior use.
+Limited demographic checks retain missingness and suppress small groups; they establish no
+fairness or causal conclusion.
+
+Read [notebook 04](notebooks/04_model_optimization.ipynb), the
+[development selection report](reports/modeling/model_selection_report.md),
+[structured outputs](reports/modeling/phase4/), and
+[Phase 5 recommendation](reports/modeling/phase5_recommendation.md).
+Local verification: **158 tests passed**, all **13 notebook code cells** executed with zero
+errors, six figures visually reviewed, Ruff/dependency checks passed, frozen hashes unchanged,
+and saved predictions reused without rescoring. The
+[Phase 4 verification record](reports/modeling/phase4/verification.json) records the evidence.
+
+Validation has informed earlier feature development, calibration and model selection. Bootstrap
+intervals condition on fitted candidates and exclude retraining/selection uncertainty. Earlier
+full-cohort EDA also exposed eventual test outcomes indirectly. These limitations, historical data,
+uncertain field arrival times and incomplete outside-hospital follow-up limit generalization.
+
 ## Dataset
 
 [UCI Diabetes 130-US Hospitals, 1999–2008](https://doi.org/10.24432/C5230J),
@@ -169,6 +244,7 @@ python -m pip install --no-deps --no-build-isolation .
 make phase1
 make phase2
 make phase3
+make phase4
 ```
 
 On Windows, activate with `.venv\Scripts\Activate.ps1` and use the equivalent commands:
@@ -179,17 +255,21 @@ python -m readmit_iq.data.inspect
 python scripts/execute_notebook.py
 python scripts/execute_notebook.py notebooks/02_eda.ipynb
 python scripts/execute_notebook.py notebooks/03_feature_engineering_and_baselines.ipynb
+python scripts/execute_notebook.py notebooks/04_model_optimization.ipynb --timeout 3600
 python scripts/verify_environment.py
 python -m pip check
-python -m pytest
+python -m pytest --junitxml=.cache/phase4-tests.xml
+python scripts/verify_phase4.py
 ```
 
-For this existing workspace, rerun **`make phase3` only**. Once partitions are frozen,
+For this existing workspace, rerun **`make phase4`** to verify/reuse completed development work.
+`make phase3` remains available for baseline reproduction. Once partitions are frozen,
 full-cohort Phase 2 EDA is blocked; use its archived notebook/reports. Do not delete the lock
 to explore test data. `make split` verifies existing hashes or reconstructs the same assignments
 from verified raw data in a fresh checkout; it refuses silent reallocation or overwrite.
 CI executes source inspection and EDA first, then explicitly runs `make split` before
-`make phase3`. Freezing before the EDA notebook would correctly trigger the test-access guard.
+`make phase3`, then the complete `make phase4`. Freezing before the EDA notebook would correctly
+trigger the test-access guard.
 The baseline-notebook target also verifies the split as a prerequisite.
 
 Frozen CSV serialization fixes UTF-8, LF line endings, compression level, zero timestamp and
@@ -200,17 +280,20 @@ The original manifest, partition hashes and allocation are preserved. Reconstruc
 and checked against the entire committed contract before becoming the local frozen split;
 a mismatch leaves the manifest untouched and no replacement lock.
 Fifteen additional split regression cases cover platform headers, reconstruction and failure
-handling; eleven reporting cases protect reviewed conclusions. The current local suite passes
-all 119 tests. Phase 3 reports retain their original execution results.
+handling; eleven reporting cases protect reviewed conclusions. The suite had 119 tests at the
+start of Phase 4, which adds 39 cases. Phase 3 reports retain their original execution results.
 
-`requirements.txt` pins the environment used by all three phases. No Phase 2/3 dependency was added.
+`requirements.txt` pins the environment used by all four phases. Phase 4 adds Optuna 5.0.0,
+MLflow-skinny 3.16.1 and its local SQLite dependencies without changing earlier package pins.
 Platform-only packages use markers.
 Exact pinned versions were tested on Python 3.12/macOS arm64; other Python/platform combinations
 are not verified locally. If a pin is unavailable, resolve `python -m pip install '.[dev]'`
 in a fresh environment and record a separate lock instead of silently changing this one.
-`pyproject.toml` declares direct dependencies and future modeling/API/demo extras. Those extras
-are deferred and have not been installed, resolved together or tested. Phase 3 uses installed
-scikit-learn estimators; no Optuna, SHAP, SMOTE, MLflow or additional booster package is used.
+`pyproject.toml` declares direct dependencies, optimization extras and future modeling/API/demo
+extras. The broad future extras are deferred and have not been resolved together or tested.
+Phase 3 uses scikit-learn estimators. Phase 4 adds Optuna/local MLflow; no SHAP, SMOTE,
+additional booster package, API or deployment is implemented. Some web packages are transitive
+MLflow dependencies, not an application service.
 
 Use `make download`, `make inspect`, `make notebook`, `make verify`, `make test`, or `make lint`
 for Phase 1 steps. `make eda` rebuilds the cohort/reports/figures; `make eda-notebook` executes
@@ -231,6 +314,29 @@ are explicitly recognized with the original numerical tolerance; other changes s
 review. Forest comparison prose uses the current paired estimate and interval, and checks that
 its ranking, inconclusive interval and default-threshold confusion counts remain unchanged.
 
+`make optimize` performs or verifies training-only searches and sealed candidate fits.
+`make optimization-reports` scores the fixed candidates once on validation, or verifies/reuses
+their cached predictions, then rebuilds aggregate reports and figures. `make optimization-notebook`
+executes the complete Phase 4 workflow; `make phase4` adds artifact/environment verification,
+lint and the full test suite. It requires the existing frozen split and Phase 3 reference artifacts.
+Missing or changed splits fail; Phase 4 never reconstructs them. Changed training code, policy,
+dependencies, model bytes or prediction bytes cannot silently reuse the prior comparison.
+Do not delete seals/caches to reopen tuning after validation has informed selection.
+
+MLflow runs are local to ignored `mlruns/phase4/tracking.sqlite`, with explicit local tracking
+and registry URIs, no credentials, no server and no raw-data uploads. Run IDs, parameters,
+CV/final metrics, Git revision, seed and development artifact paths are recorded. Inspect locally:
+
+```python
+from pathlib import Path
+from mlflow.tracking import MlflowClient
+
+uri = "sqlite:///" + str(Path("mlruns/phase4/tracking.sqlite").resolve())
+client = MlflowClient(tracking_uri=uri, registry_uri=uri)
+experiment = client.get_experiment_by_name("ReadmitIQ-Phase4")
+runs = client.search_runs([experiment.experiment_id])
+```
+
 Source settings live in `configs/config.yaml`; Phase 2 policy lives in `configs/phase2.yaml`.
 Source hashes enforce the reviewed release. A changed
 download fails verification and requires review. Raw data, `.venv`, credentials, caches and
@@ -240,21 +346,23 @@ are documented in `.env.example`. The frozen split and estimator seed is 42.
 ## Structure
 
 ```text
-configs/                     Source/cohort contracts, frozen split and fixed experiment registry
+configs/                     Source/cohort contracts, split, baseline and optimization policies
 data/{raw,interim,processed}/ Verified raw; ignored cohort and compressed frozen partitions
 docs/                        Dataset selection and source dictionary
-notebooks/                   Executed notebooks 01, 02 and 03
+notebooks/                   Executed notebooks 01–04
 src/readmit_iq/data/          Download, load, validate and inspect modules
 src/readmit_iq/analysis/      Feature audit, patient-cluster statistics, reports and plots
 src/readmit_iq/modeling/      Splits, features, encoders, pipelines, training and validation
+src/readmit_iq/optimization/  Group CV, Optuna, calibration, local tracking and development selection
 reports/data_quality/        Raw checks, cohort report, feature audit and missingness decisions
 reports/eda/                 Reproducible descriptive tables and summary JSON
 reports/figures/eda/          Seven reviewed EDA figures
 reports/modeling/            Frozen manifest, feature policy and validation results
-reports/figures/modeling/    Four reviewed modeling figures
+reports/figures/modeling/    Four baseline figures plus six Phase 4 figures
 scripts/                     Environment verification and notebook execution
 tests/                       Source, cohort, split, feature, encoding and model-pipeline checks
 models/development/          Ignored experimental pipelines and validation predictions
+mlruns/phase4/               Ignored local SQLite experiment tracking
 ```
 
 The `src/readmit_iq` package separates imports from the repository root. A regular package
@@ -262,22 +370,21 @@ installation is used because this local macOS environment hides editable-install
 After modifying source modules, reinstall with `python -m pip install --no-deps --no-build-isolation .`.
 Run commands from the repository root, or set `READMITIQ_CONFIG` to the YAML file's full path.
 APIs and future notebooks are not scaffolded.
-Docker, advanced ML dependencies and service CI will be added when those phases begin.
+Docker and service CI remain deferred.
 The GitHub repository is [Ajay0612/readmit-iq](https://github.com/Ajay0612/readmit-iq),
 with `main` as the development branch and `origin` as the local remote.
 Only project source, configuration, tests, documentation, executed notebooks, aggregate reports
 and figures are versioned; downloaded data, processed partitions, development models and local
 environment files stay outside Git.
-The GitHub Actions workflow executes all three notebooks, lint and tests on Python 3.12
+The GitHub Actions workflow executes all four notebooks, the full bounded search, lint and tests
+on Python 3.12
 for pushes and pull requests. See [workflow runs](https://github.com/Ajay0612/readmit-iq/actions)
 for remote execution status. Earlier verification reports describe their original execution state.
 
-## Phase 4, pending authorization
+## Phase 5, pending authorization
 
-Prioritize histogram gradient boosting and logistic regression, based on the validation evidence.
-Use patient-grouped training folds for bounded tuning, then examine probability calibration and
-an outreach operating policy using development data only. Keep test locked. Resolve live field
-arrival times and external validation before operational claims. Random forest is a lower-priority
-reference; redundant utilization additions and uncertain encounter summaries have no current
-evidence of benefit. These results do not justify automatic resampling.
-No later phase starts automatically.
+Carry logistic primary and boosting challenger forward under the frozen confirmed-discharge
+contract. Investigate low-utilization errors, subgroup calibration and missingness; verify actual
+field-arrival times. Establish intervention capacity and error costs before selecting a threshold.
+Plan responsible explanations and contemporary external validation. Any final test evaluation
+requires a separately authorized, frozen evaluation plan. No later phase starts automatically.

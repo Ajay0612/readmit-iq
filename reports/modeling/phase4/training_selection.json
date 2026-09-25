@@ -1,0 +1,210 @@
+{
+  "fingerprint": {
+    "policy": {
+      "phase": 4,
+      "random_seed": 42,
+      "threads": 2,
+      "report_dir": "reports/modeling/phase4",
+      "artifact_dir": "models/development/phase4",
+      "figure_dir": "reports/figures/modeling/phase4",
+      "tracking_dir": "mlruns/phase4",
+      "experiment_name": "ReadmitIQ-Phase4",
+      "cv": {
+        "folds": 5,
+        "prevalence_tolerance": 0.01
+      },
+      "features": {
+        "allowed": [
+          "raw",
+          "indicators",
+          "raw_engineered"
+        ],
+        "sensitivity_only": [
+          "diagnosis_grouped",
+          "diagnosis_raw"
+        ],
+        "preference": [
+          "raw",
+          "indicators",
+          "raw_engineered"
+        ],
+        "minimum_ap_gain": 0.001,
+        "rare_min_count": 100
+      },
+      "tuning": {
+        "logistic": {
+          "trials": 30,
+          "minimum_trials": 15,
+          "plateau_patience": 10,
+          "C": [
+            0.001,
+            100.0
+          ]
+        },
+        "boosting": {
+          "trials": 50,
+          "minimum_trials": 25,
+          "plateau_patience": 15,
+          "learning_rate": [
+            0.025,
+            0.15
+          ],
+          "max_iter": [
+            75,
+            125,
+            150,
+            200,
+            300
+          ],
+          "max_leaf_nodes": [
+            7,
+            15,
+            31
+          ],
+          "min_samples_leaf": [
+            20,
+            30,
+            50,
+            100,
+            200
+          ],
+          "l2_regularization": [
+            0.0,
+            0.1,
+            1.0,
+            10.0,
+            30.0
+          ]
+        },
+        "plateau_minimum_improvement": 0.0002
+      },
+      "calibration": {
+        "methods": [
+          "uncalibrated",
+          "sigmoid",
+          "isotonic"
+        ],
+        "minimum_brier_improvement": 0.0001,
+        "maximum_ap_loss": 0.001
+      },
+      "selection": {
+        "minimum_boosting_ap_gain": 0.005,
+        "maximum_brier_disadvantage": 0.0002,
+        "maximum_sd_ratio": 2.0
+      },
+      "evaluation": {
+        "bootstrap_replicates": 1000,
+        "threshold_step": 0.01,
+        "subgroup_threshold": 0.1,
+        "subgroup_min_encounters": 200,
+        "subgroup_min_positives": 30,
+        "inference_batch_size": 1024,
+        "inference_repeats": 7
+      }
+    },
+    "split_manifest_sha256": "918726d0ecedf8c3a94a20e63218e024f5986e1886a69879d6fb13dea0309d66",
+    "frozen_files": {
+      "assignments.csv.gz": "11b732c0865bb1e52e404c0d3b2896682d0685ef931f7d43badc9647ceae183a",
+      "test.csv.gz": "04816664930093cf38b0c2dee1caaeb4097272bbc861a6c1d5521022c964583c",
+      "train.csv.gz": "571d8111634552bbc314eaa227ef4ab4db72edfa6f51b26c2cbda2328ebd9b51",
+      "validation.csv.gz": "1eaea4186167bade6d37eb7e48e539551e0b960879501c44adf938c3595d1574"
+    },
+    "implementation": {
+      "optimization/contract.py": "8c6fe3e2d3fef878130839ff72af36cd2287ebc4c418e36320cdb6765b2cef33",
+      "optimization/cv.py": "d4feb7b81192e5b6c8dddb47644437e7fa6a6585abc9c26e369d4094b6c2401d",
+      "optimization/pipelines.py": "93f7658e7dcc6b3d2148cc3f8dc99f6dc219a9f00fbcbcf558f15409e1a07b57",
+      "optimization/tracking.py": "62cdbb6ade8f3704f64534d45b393ddb187515f6c2b9bcbb509d87c011c0a9b7",
+      "optimization/tune.py": "ee81c90740c575f1b40c06cc93e1bc7a18d06e6f5727269d0f348a18246d9af1",
+      "optimization/fit.py": "a6dac833e8df0ebf53438381f443454bc6e7273b74ec1dee65bad734fd42068e",
+      "modeling/features.py": "05609b1936ba76d2e75806ea5c2b2e7653c153e2396cb63b29bbbe8708ef39ab",
+      "modeling/preprocessing.py": "4b152f81d6b5a0ef28ee16471c9f73cb8e3a210a107f168b7fbacb5d07be13ba",
+      "modeling/diagnoses.py": "2dfb674685f44185ed866a8a6db2c7c8df8eb28905aa2049056f57389397324f",
+      "modeling/metrics.py": "69085264807061876d8f84a96796283bcadf9527d1d0735fe6352fa241d279c4"
+    },
+    "packages": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "scikit-learn": "1.9.1",
+      "optuna": "5.0.0",
+      "mlflow-skinny": "3.16.1"
+    }
+  },
+  "fingerprint_sha256": "a40fec0b4d366a4104255bcd5bba118cd1ec34d3d0356a7276ca2ee9d03e7647",
+  "git_commit": "a48c68b10e0339e95c934ea4ab6b1ee7ff00a904",
+  "fold_membership_sha256": "8e3a390632e2e30ad6084daa2911cfea8d42ffb947348be06d30180302414eaf",
+  "selected": {
+    "logistic": {
+      "configuration": "raw",
+      "parameters": {
+        "C": 0.09988151348099303
+      },
+      "cv_average_precision_mean": 0.21243439033055395,
+      "cv_average_precision_sd": 0.007680025338909843,
+      "cv_roc_auc_mean": 0.6588757734215117,
+      "cv_roc_auc_sd": 0.007950343496692016,
+      "cv_brier_mean": 0.09509313803718959,
+      "cv_brier_sd": 0.0005076203361114948,
+      "cv_recall_mean": 0.019383057505022568,
+      "cv_recall_sd": 0.002765599930012113,
+      "cv_precision_mean": 0.4951890339659891,
+      "cv_precision_sd": 0.09218292165918922,
+      "cv_f1_mean": 0.03722891958774342,
+      "cv_f1_sd": 0.005003106700242338,
+      "cv_ap_min": 0.20512081532132576,
+      "cv_ap_max": 0.2255139300514307,
+      "best_trial": 12,
+      "trials": 15,
+      "stop_reason": "prespecified training-CV plateau"
+    },
+    "boosting": {
+      "configuration": "raw",
+      "parameters": {
+        "learning_rate": 0.04938583890481199,
+        "max_iter": 75,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 50,
+        "l2_regularization": 30.0
+      },
+      "cv_average_precision_mean": 0.22020666333049244,
+      "cv_average_precision_sd": 0.00527217422840228,
+      "cv_roc_auc_mean": 0.6638683038108647,
+      "cv_roc_auc_sd": 0.008214483784095531,
+      "cv_brier_mean": 0.09448797577578875,
+      "cv_brier_sd": 0.000290477744976652,
+      "cv_recall_mean": 0.0026874115983026876,
+      "cv_recall_sd": 0.004594167402803879,
+      "cv_precision_mean": 0.23894736842105263,
+      "cv_precision_sd": 0.357189708046895,
+      "cv_f1_mean": 0.005259786020885387,
+      "cv_f1_sd": 0.00894903835578303,
+      "cv_ap_min": 0.2123828582311863,
+      "cv_ap_max": 0.22711069563627403,
+      "best_trial": 14,
+      "trials": 30,
+      "stop_reason": "prespecified training-CV plateau"
+    },
+    "forest": {
+      "configuration": "raw",
+      "parameters": {},
+      "cv_average_precision_mean": 0.21760458307704916,
+      "cv_average_precision_sd": 0.005374813295375196,
+      "cv_roc_auc_mean": 0.6620237730702188,
+      "cv_roc_auc_sd": 0.007623866420833552,
+      "cv_brier_mean": 0.09499102199975057,
+      "cv_brier_sd": 0.00024525019575067513,
+      "cv_recall_mean": 0.0,
+      "cv_recall_sd": 0.0,
+      "cv_precision_mean": 0.0,
+      "cv_precision_sd": 0.0,
+      "cv_f1_mean": 0.0,
+      "cv_f1_sd": 0.0,
+      "cv_ap_min": 0.21185376743258968,
+      "cv_ap_max": 0.22343901087391013,
+      "trials": 1,
+      "best_trial": 0,
+      "stop_reason": "fixed reference; no tuning"
+    }
+  },
+  "validation_opened": false,
+  "test_evaluated": false
+}

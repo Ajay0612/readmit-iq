@@ -1,0 +1,17 @@
+{
+  "figures": [
+    "reports/figures/modeling/phase4/01_cv_comparison.png",
+    "reports/figures/modeling/phase4/02_validation_precision_recall.png",
+    "reports/figures/modeling/phase4/03_calibration_comparison.png",
+    "reports/figures/modeling/phase4/04_threshold_behavior.png",
+    "reports/figures/modeling/phase4/05_feature_configuration.png",
+    "reports/figures/modeling/phase4/06_fold_stability.png"
+  ],
+  "reports": [
+    "tuning_report.md",
+    "calibration_report.md",
+    "model_selection_report.md",
+    "phase5_recommendation.md"
+  ],
+  "test_evaluated": false
+}

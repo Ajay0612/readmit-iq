@@ -1,0 +1,110 @@
+{
+  "training_selection_sha256": "2f965b6efe3b79ab79fcc51e98f0b35e6332e49ee92a1472b5af82b263a555cd",
+  "models": {
+    "logistic__uncalibrated": {
+      "family": "logistic",
+      "calibration": "uncalibrated",
+      "configuration": "raw",
+      "parameters": {
+        "C": 0.09988151348099303
+      },
+      "sha256": "ff82996f1f49008dec373655d53cf95a2ce5d940cb7dbc2bd1e25ea6fe447fa8",
+      "artifact_bytes": 4127,
+      "fit_seconds": 0.3670678750058869,
+      "fit_encounters": 63563,
+      "encoded_features": 77
+    },
+    "logistic__sigmoid": {
+      "family": "logistic",
+      "calibration": "sigmoid",
+      "configuration": "raw",
+      "parameters": {
+        "C": 0.09988151348099303
+      },
+      "sha256": "fc519bed0bf56b0a038cba2383938f1af9883cd53da5ba693388d0325284f644",
+      "artifact_bytes": 489972,
+      "fit_seconds": 2.1520938749890774,
+      "fit_encounters": 63563,
+      "encoded_features": 77
+    },
+    "logistic__isotonic": {
+      "family": "logistic",
+      "calibration": "isotonic",
+      "configuration": "raw",
+      "parameters": {
+        "C": 0.09988151348099303
+      },
+      "sha256": "7070d0248523f79d3de03cdc9737c3bf70f520c259aedb98e2574b1e633ff0a2",
+      "artifact_bytes": 491281,
+      "fit_seconds": 2.1200395839987323,
+      "fit_encounters": 63563,
+      "encoded_features": 77
+    },
+    "boosting__uncalibrated": {
+      "family": "boosting",
+      "calibration": "uncalibrated",
+      "configuration": "raw",
+      "parameters": {
+        "learning_rate": 0.04938583890481199,
+        "max_iter": 75,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 50,
+        "l2_regularization": 30.0
+      },
+      "sha256": "66ac3b086a0092a6c45e27c50888edda10a429550751a3074e8e99f063c8c8b0",
+      "artifact_bytes": 58489,
+      "fit_seconds": 0.5151976250053849,
+      "fit_encounters": 63563,
+      "encoded_features": 10
+    },
+    "boosting__sigmoid": {
+      "family": "boosting",
+      "calibration": "sigmoid",
+      "configuration": "raw",
+      "parameters": {
+        "learning_rate": 0.04938583890481199,
+        "max_iter": 75,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 50,
+        "l2_regularization": 30.0
+      },
+      "sha256": "251d492b05841df53f8eb2c7eb9cb9a22c6254f2b6ff76be6a05bd374ca8b8f9",
+      "artifact_bytes": 544358,
+      "fit_seconds": 3.1032991250103805,
+      "fit_encounters": 63563,
+      "encoded_features": 10
+    },
+    "boosting__isotonic": {
+      "family": "boosting",
+      "calibration": "isotonic",
+      "configuration": "raw",
+      "parameters": {
+        "learning_rate": 0.04938583890481199,
+        "max_iter": 75,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 50,
+        "l2_regularization": 30.0
+      },
+      "sha256": "719cc900c0bd792258e84be713b390f58411bfbc5b9ced4ae1cb4e06d901def3",
+      "artifact_bytes": 545806,
+      "fit_seconds": 3.0380182920052903,
+      "fit_encounters": 63563,
+      "encoded_features": 10
+    },
+    "forest__uncalibrated": {
+      "family": "forest",
+      "calibration": "uncalibrated",
+      "configuration": "raw",
+      "parameters": {},
+      "sha256": "a85891bdf8223edbd48994e3f8b7975a93918ebbcb641a64ddc1257b3a5af8fa",
+      "artifact_bytes": 2252031,
+      "fit_seconds": 3.484426209004596,
+      "fit_encounters": 63563,
+      "encoded_features": 77
+    }
+  },
+  "fold_membership_sha256": "8e3a390632e2e30ad6084daa2911cfea8d42ffb947348be06d30180302414eaf",
+  "calibration_partition": "train",
+  "validation_opened": false,
+  "test_evaluated": false
+}

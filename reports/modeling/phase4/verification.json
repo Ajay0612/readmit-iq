@@ -1,0 +1,47 @@
+{
+  "phase": 4,
+  "scope": "Development validation only; no test partition parsing or scoring",
+  "training_git_commit": "a48c68b10e0339e95c934ea4ab6b1ee7ff00a904",
+  "environment": {
+    "python": "3.12.2",
+    "system": "Darwin",
+    "machine": "arm64"
+  },
+  "frozen_files": {
+    "assignments.csv.gz": "11b732c0865bb1e52e404c0d3b2896682d0685ef931f7d43badc9647ceae183a",
+    "test.csv.gz": "04816664930093cf38b0c2dee1caaeb4097272bbc861a6c1d5521022c964583c",
+    "train.csv.gz": "571d8111634552bbc314eaa227ef4ab4db72edfa6f51b26c2cbda2328ebd9b51",
+    "validation.csv.gz": "1eaea4186167bade6d37eb7e48e539551e0b960879501c44adf938c3595d1574"
+  },
+  "frozen_manifest_sha256": "918726d0ecedf8c3a94a20e63218e024f5986e1886a69879d6fb13dea0309d66",
+  "patient_overlap": {
+    "train_validation": 0,
+    "train_test": 0,
+    "validation_test": 0
+  },
+  "training_fold_membership_sha256": "8e3a390632e2e30ad6084daa2911cfea8d42ffb947348be06d30180302414eaf",
+  "saved_models_verified": 7,
+  "validation_prediction_sha256": "a1391f2383c7f7dfb7d0599ae98ba77d8bfe88d58fb10f408e849787cd942931",
+  "validation_score_passes": 1,
+  "cached_metrics_reconciled": true,
+  "mlflow_runs": 63,
+  "mlflow_validation_runs_verified": 7,
+  "tests_passed": 158,
+  "test_report_sha256": "a76bb6b9f1353e7262214fbfdc5f84fdd95c38dbca3754eaa933ec4eebd11339",
+  "notebook": "notebooks/04_model_optimization.ipynb",
+  "notebook_sha256": "0f56dea8936c5bb7f7a7528afa4d7863f10b1e832eef70e9b4328bbd9f2ffb6e",
+  "executed_code_cells": 13,
+  "notebook_error_outputs": 0,
+  "notebook_images_match_saved_figures": true,
+  "figures": {
+    "reports/figures/modeling/phase4/01_cv_comparison.png": "7c365ecfc8b6e67f06704cac5dd0af5e733cbfc6c538011c7cb86781ab2aa439",
+    "reports/figures/modeling/phase4/02_validation_precision_recall.png": "47d7d255c9751f48edcaa4e636a2eeef80088280cd511d8241cdc7e69c475484",
+    "reports/figures/modeling/phase4/03_calibration_comparison.png": "a3a0a361046d4c4794a468a5424dfe0a306f57b6af941fdb3c6fe4f126530666",
+    "reports/figures/modeling/phase4/04_threshold_behavior.png": "9095c8e2bb8744e83600859de649cd785caaa8aaa789ff9308ff724862f0f492",
+    "reports/figures/modeling/phase4/05_feature_configuration.png": "8dae6e7044a174d78e30c88cdfc663676df6d89e3c8b864c9a5936e7ed02185e",
+    "reports/figures/modeling/phase4/06_fold_stability.png": "69734d027580c2d20512e9c68c991c1775924e4bd2e7913247db0215090e15f5"
+  },
+  "test_evaluated": false,
+  "operational_threshold_selected": false,
+  "production_model": false
+}

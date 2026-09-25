@@ -1,0 +1,19 @@
+{
+  "split_manifest_sha256": "918726d0ecedf8c3a94a20e63218e024f5986e1886a69879d6fb13dea0309d66",
+  "frozen_files": {
+    "assignments.csv.gz": "11b732c0865bb1e52e404c0d3b2896682d0685ef931f7d43badc9647ceae183a",
+    "test.csv.gz": "04816664930093cf38b0c2dee1caaeb4097272bbc861a6c1d5521022c964583c",
+    "train.csv.gz": "571d8111634552bbc314eaa227ef4ab4db72edfa6f51b26c2cbda2328ebd9b51",
+    "validation.csv.gz": "1eaea4186167bade6d37eb7e48e539551e0b960879501c44adf938c3595d1574"
+  },
+  "patient_overlap": {
+    "train_validation": 0,
+    "train_test": 0,
+    "validation_test": 0
+  },
+  "fold_membership_sha256": "8e3a390632e2e30ad6084daa2911cfea8d42ffb947348be06d30180302414eaf",
+  "training_encounters": 63563,
+  "test_records_loaded": false,
+  "test_evaluated": false,
+  "scoring_time": "Confirmed discharge after destination is known"
+}

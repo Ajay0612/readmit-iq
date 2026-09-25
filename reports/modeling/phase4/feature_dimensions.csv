@@ -1,0 +1,11 @@
+family,configuration,min_encoded_features,max_encoded_features
+boosting,diagnosis_grouped,14,14
+boosting,diagnosis_raw,14,14
+boosting,indicators,10,10
+boosting,raw,10,10
+boosting,raw_engineered,14,14
+logistic,diagnosis_grouped,113,114
+logistic,diagnosis_raw,339,345
+logistic,indicators,76,77
+logistic,raw,76,77
+logistic,raw_engineered,80,81
