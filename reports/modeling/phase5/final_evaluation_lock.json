@@ -1,0 +1,142 @@
+{
+  "created_utc": "2026-09-25T21:00:09.771416+00:00",
+  "pretest_code_commit": "5714a2961f1346f7b505f439e6da2e4298b9b41c",
+  "protocol_path": "reports/modeling/final_evaluation_protocol.md",
+  "protocol_sha256": "17777ba78297e3c3ae1366fc19f6845a06fe1373cfe49d70cdc4688069000843",
+  "specification_sha256": "f97bc6218422681b90a476132a31a89a03fdbb8649a3fd4ab96c2a177caec1b7",
+  "implementation": {
+    "src/readmit_iq/decision_support/context.py": "a2e85b676d55d1af679566a48556beb6ad41b6a4bdf6bc2265e8f46bfbbe175c",
+    "src/readmit_iq/decision_support/ranking.py": "763a62c9b2b634738179214e5a35b0b256784b9bc7f29a5c4d151b4a8b5c7f6c",
+    "src/readmit_iq/decision_support/uncertainty.py": "4b14e8766a1074ff9e8f2abe0e4d4be3c28e7859047a4d7961d1d464764b26ca",
+    "src/readmit_iq/decision_support/subgroups.py": "5b0ae43820a441b009edda49d444fc49d552b0c7f68560c634d890b2f12c7545",
+    "src/readmit_iq/decision_support/evaluation.py": "56c6a3bd78a61e390aab5119b55eb6adff244320d201799548f05785121200ad",
+    "src/readmit_iq/decision_support/freeze.py": "570a5285ade3bfb3bffea404d14eaebc8c4d7d8480befcb6c697a25e14a291b7",
+    "src/readmit_iq/decision_support/final_evaluation.py": "f30f8b5456bc42796be55e7c7574919b123e0243ef074978ef2002610671c71c",
+    "src/readmit_iq/modeling/features.py": "05609b1936ba76d2e75806ea5c2b2e7653c153e2396cb63b29bbbe8708ef39ab",
+    "src/readmit_iq/modeling/preprocessing.py": "4b152f81d6b5a0ef28ee16471c9f73cb8e3a210a107f168b7fbacb5d07be13ba",
+    "src/readmit_iq/modeling/diagnoses.py": "2dfb674685f44185ed866a8a6db2c7c8df8eb28905aa2049056f57389397324f",
+    "src/readmit_iq/modeling/metrics.py": "69085264807061876d8f84a96796283bcadf9527d1d0735fe6352fa241d279c4",
+    "src/readmit_iq/modeling/splitting.py": "e30bfe62722d8386f03ad1e37d2d567cdfe6d05e768a4e8e865586eacaee145a",
+    "src/readmit_iq/optimization/contract.py": "8c6fe3e2d3fef878130839ff72af36cd2287ebc4c418e36320cdb6765b2cef33",
+    "src/readmit_iq/optimization/pipelines.py": "93f7658e7dcc6b3d2148cc3f8dc99f6dc219a9f00fbcbcf558f15409e1a07b57",
+    "configs/phase5.yaml": "464744d733a32465aac2de851f3f1da9dea12f400716d276a9d13b3913128cdf",
+    "configs/phase4.yaml": "0e51b2e4f3f4b50a0af9be03816378d32f0a602b62e5f6ec9845ed996db1694f",
+    "configs/phase3.yaml": "7222cd15ed49c47531dd913ab67c689aa46ba9c67877c4e2a630f0c02d106a6e",
+    "configs/phase2.yaml": "cd122f1dd95658b80caca50b26fff278289f393afb7a7df0d9944e149919bedf",
+    "requirements.txt": "edeb57dbf3858186e9cdf942a7d893fde746712f00411b896df11e0dc911d7fb",
+    "reports/modeling/final_feature_policy.md": "4df89b8b0fb4f5632deeb97f91ce0acdfd9bdff2938975183c28ed3241909acf"
+  },
+  "policy": {
+    "phase": 5,
+    "random_seed": 42,
+    "threads": 2,
+    "primary": "logistic__uncalibrated",
+    "challenger": "boosting__uncalibrated",
+    "feature_configuration": "raw",
+    "report_dir": "reports/modeling/phase5",
+    "artifact_dir": "models/development/phase5",
+    "figure_dir": "reports/figures/phase5",
+    "targeting": {
+      "type": "capacity_rank",
+      "fraction": 0.1,
+      "capacity_is_assumed": true,
+      "unit": "eligible discharge encounter",
+      "capacity_rounding": "floor",
+      "tie_break": "sha256 of seed colon encounter_id; ascending",
+      "capacities": [
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25
+      ],
+      "risk_groups": 10,
+      "scenario_encounters": 10000,
+      "illustrative_thresholds": [
+        0.05,
+        0.1,
+        0.15,
+        0.169407,
+        0.2,
+        0.25,
+        0.3,
+        0.5
+      ]
+    },
+    "uncertainty": {
+      "bootstrap_replicates": 1000,
+      "confidence": 0.95,
+      "bootstrap_policy": "rerank weighted resampled encounters at the frozen capacity"
+    },
+    "subgroups": {
+      "minimum_encounters": 200,
+      "minimum_patients": 100,
+      "minimum_positives": 30,
+      "minimum_negatives": 30,
+      "material_probability_bias": 0.02,
+      "groups": [
+        "prior_inpatient",
+        "prior_inpatient_high",
+        "prior_emergency",
+        "age",
+        "gender",
+        "race",
+        "length_of_stay",
+        "discharge_destination",
+        "admission_type",
+        "admission_source",
+        "specialty_missing",
+        "payer_missing"
+      ]
+    },
+    "explanations": {
+      "background_rows": 128,
+      "comparison_rows": 256,
+      "permutation_repeats": 8,
+      "units": "log_odds",
+      "categorical_references": {
+        "age": "[50-60)",
+        "gender": "Female",
+        "admission_type_id": "1",
+        "admission_source_id": "7",
+        "discharge_disposition_id": "1",
+        "medical_specialty": "InternalMedicine"
+      },
+      "cases": [
+        "targeted_positive",
+        "targeted_negative",
+        "missed_positive_no_prior_inpatient"
+      ]
+    },
+    "final_test": {
+      "models": [
+        "logistic__uncalibrated",
+        "boosting__uncalibrated"
+      ],
+      "primary_metrics": [
+        "average_precision",
+        "roc_auc",
+        "brier",
+        "recall",
+        "precision",
+        "lift"
+      ],
+      "allow_retuning": false,
+      "allow_calibration_change": false,
+      "allow_policy_change": false
+    }
+  },
+  "policy_sha256": "718bbba503bed4ad5388d86d5d74a83590535a04e2dc90d5b6b2dc1d64052e3c",
+  "model_sha256": {
+    "logistic__uncalibrated": "ff82996f1f49008dec373655d53cf95a2ce5d940cb7dbc2bd1e25ea6fe447fa8",
+    "boosting__uncalibrated": "66ac3b086a0092a6c45e27c50888edda10a429550751a3074e8e99f063c8c8b0"
+  },
+  "frozen_files": {
+    "assignments.csv.gz": "11b732c0865bb1e52e404c0d3b2896682d0685ef931f7d43badc9647ceae183a",
+    "test.csv.gz": "04816664930093cf38b0c2dee1caaeb4097272bbc861a6c1d5521022c964583c",
+    "train.csv.gz": "571d8111634552bbc314eaa227ef4ab4db72edfa6f51b26c2cbda2328ebd9b51",
+    "validation.csv.gz": "1eaea4186167bade6d37eb7e48e539551e0b960879501c44adf938c3595d1574"
+  },
+  "split_manifest_sha256": "918726d0ecedf8c3a94a20e63218e024f5986e1886a69879d6fb13dea0309d66",
+  "test_evaluated_at_freeze": false
+}
