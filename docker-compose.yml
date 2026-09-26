@@ -1,0 +1,36 @@
+name: readmitiq-demo
+services:
+  api:
+    image: readmitiq-api:phase6
+    build:
+      context: .
+      target: api
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - type: bind
+        source: ./models/final/readmit_iq_logistic.joblib
+        target: /model/readmit_iq_logistic.joblib
+        read_only: true
+        bind:
+          create_host_path: false
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  demo:
+    image: readmitiq-demo:phase6
+    build:
+      context: .
+      target: demo
+    ports:
+      - "127.0.0.1:8501:8501"
+    environment:
+      READMITIQ_API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]

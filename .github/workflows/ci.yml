@@ -23,7 +23,7 @@ jobs:
       - name: Create environment
         run: python -m venv .venv
       - name: Install project dependencies
-        run: make install
+        run: make install-phase6
       - name: Download and verify the public source
         run: make download inspect
       - name: Execute source and EDA notebooks before freezing
@@ -86,3 +86,37 @@ jobs:
               if path.exists():
                   print(f"\nphase4/{name}\n{path.read_text()}")
           PY
+
+  serving-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*txt
+      - name: Install bounded serving and UI test dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements-demo.txt pytest==9.1.1 httpx==0.28.1 ruff==0.16.8
+          .venv/bin/python -m pip install --no-deps --no-build-isolation .
+          .venv/bin/python -m pip check
+      - name: Verify contract tests and explicit real-artifact skips
+        run: make lint phase6-test
+      - name: Build non-root API and UI without any model binary
+        run: docker compose build
+      - name: Verify missing-model image fails closed
+        run: .venv/bin/python scripts/smoke_container.py
+      - name: Preserve serving contract evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase6-serving-contract-evidence
+          retention-days: 7
+          path: |
+            .cache/phase6-tests.xml
+            .cache/phase6-container-contract.json

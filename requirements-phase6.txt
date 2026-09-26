@@ -1,0 +1,3 @@
+# Preserve the byte-frozen Phase 1–5 lock; add serving. Install UI in .venv-demo.
+-r requirements.txt
+-r requirements-serving.txt

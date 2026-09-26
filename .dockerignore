@@ -1,0 +1,22 @@
+# Deny by default: the ignored model is supplied only by a read-only runtime mount.
+**
+!Dockerfile
+!requirements-serving.txt
+!requirements-demo.txt
+!pyproject.toml
+!README.md
+!src/
+!src/readmit_iq/
+!src/readmit_iq/**/
+!src/readmit_iq/**/*.py
+!src/readmit_iq/serving/contract.json
+!configs/
+!configs/phase2.yaml
+!reports/
+!reports/data_quality/
+!reports/data_quality/id_mapping.json
+!reports/modeling/
+!reports/modeling/final_model_specification.json
+!reports/modeling/final_model_metadata.json
+!app/
+!app/streamlit_app.py
