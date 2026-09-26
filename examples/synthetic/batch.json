@@ -1,0 +1,304 @@
+{
+  "records": [
+    {
+      "request_id": "demo-0001",
+      "features": {
+        "time_in_hospital": 2,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[40-50)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 1,
+        "discharge_disposition_id": 1,
+        "medical_specialty": "InternalMedicine"
+      }
+    },
+    {
+      "request_id": "demo-0002",
+      "features": {
+        "time_in_hospital": 7,
+        "number_inpatient": 4,
+        "number_emergency": 2,
+        "number_outpatient": 1,
+        "age": "[60-70)",
+        "gender": "Male",
+        "admission_type_id": 1,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 6,
+        "medical_specialty": "Cardiology"
+      }
+    },
+    {
+      "request_id": "demo-0003",
+      "features": {
+        "time_in_hospital": 5,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[70-80)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 22,
+        "medical_specialty": "PhysicalMedicineandRehabilitation"
+      }
+    },
+    {
+      "request_id": "demo-0004",
+      "features": {
+        "time_in_hospital": 2,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[40-50)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 1,
+        "discharge_disposition_id": 1,
+        "medical_specialty": "InternalMedicine"
+      }
+    },
+    {
+      "request_id": "demo-0005",
+      "features": {
+        "time_in_hospital": 7,
+        "number_inpatient": 4,
+        "number_emergency": 2,
+        "number_outpatient": 1,
+        "age": "[60-70)",
+        "gender": "Male",
+        "admission_type_id": 1,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 6,
+        "medical_specialty": "Cardiology"
+      }
+    },
+    {
+      "request_id": "demo-0006",
+      "features": {
+        "time_in_hospital": 5,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[70-80)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 22,
+        "medical_specialty": "PhysicalMedicineandRehabilitation"
+      }
+    },
+    {
+      "request_id": "demo-0007",
+      "features": {
+        "time_in_hospital": 2,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[40-50)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 1,
+        "discharge_disposition_id": 1,
+        "medical_specialty": "InternalMedicine"
+      }
+    },
+    {
+      "request_id": "demo-0008",
+      "features": {
+        "time_in_hospital": 7,
+        "number_inpatient": 4,
+        "number_emergency": 2,
+        "number_outpatient": 1,
+        "age": "[60-70)",
+        "gender": "Male",
+        "admission_type_id": 1,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 6,
+        "medical_specialty": "Cardiology"
+      }
+    },
+    {
+      "request_id": "demo-0009",
+      "features": {
+        "time_in_hospital": 5,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[70-80)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 22,
+        "medical_specialty": "PhysicalMedicineandRehabilitation"
+      }
+    },
+    {
+      "request_id": "demo-0010",
+      "features": {
+        "time_in_hospital": 2,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[40-50)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 1,
+        "discharge_disposition_id": 1,
+        "medical_specialty": "InternalMedicine"
+      }
+    },
+    {
+      "request_id": "demo-0011",
+      "features": {
+        "time_in_hospital": 7,
+        "number_inpatient": 4,
+        "number_emergency": 2,
+        "number_outpatient": 1,
+        "age": "[60-70)",
+        "gender": "Male",
+        "admission_type_id": 1,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 6,
+        "medical_specialty": "Cardiology"
+      }
+    },
+    {
+      "request_id": "demo-0012",
+      "features": {
+        "time_in_hospital": 5,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[70-80)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 22,
+        "medical_specialty": "PhysicalMedicineandRehabilitation"
+      }
+    },
+    {
+      "request_id": "demo-0013",
+      "features": {
+        "time_in_hospital": 2,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[40-50)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 1,
+        "discharge_disposition_id": 1,
+        "medical_specialty": "InternalMedicine"
+      }
+    },
+    {
+      "request_id": "demo-0014",
+      "features": {
+        "time_in_hospital": 7,
+        "number_inpatient": 4,
+        "number_emergency": 2,
+        "number_outpatient": 1,
+        "age": "[60-70)",
+        "gender": "Male",
+        "admission_type_id": 1,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 6,
+        "medical_specialty": "Cardiology"
+      }
+    },
+    {
+      "request_id": "demo-0015",
+      "features": {
+        "time_in_hospital": 5,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[70-80)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 22,
+        "medical_specialty": "PhysicalMedicineandRehabilitation"
+      }
+    },
+    {
+      "request_id": "demo-0016",
+      "features": {
+        "time_in_hospital": 2,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[40-50)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 1,
+        "discharge_disposition_id": 1,
+        "medical_specialty": "InternalMedicine"
+      }
+    },
+    {
+      "request_id": "demo-0017",
+      "features": {
+        "time_in_hospital": 7,
+        "number_inpatient": 4,
+        "number_emergency": 2,
+        "number_outpatient": 1,
+        "age": "[60-70)",
+        "gender": "Male",
+        "admission_type_id": 1,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 6,
+        "medical_specialty": "Cardiology"
+      }
+    },
+    {
+      "request_id": "demo-0018",
+      "features": {
+        "time_in_hospital": 5,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[70-80)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 22,
+        "medical_specialty": "PhysicalMedicineandRehabilitation"
+      }
+    },
+    {
+      "request_id": "demo-0019",
+      "features": {
+        "time_in_hospital": 2,
+        "number_inpatient": 0,
+        "number_emergency": 0,
+        "number_outpatient": 0,
+        "age": "[40-50)",
+        "gender": "Female",
+        "admission_type_id": 3,
+        "admission_source_id": 1,
+        "discharge_disposition_id": 1,
+        "medical_specialty": "InternalMedicine"
+      }
+    },
+    {
+      "request_id": "demo-0020",
+      "features": {
+        "time_in_hospital": 7,
+        "number_inpatient": 4,
+        "number_emergency": 2,
+        "number_outpatient": 1,
+        "age": "[60-70)",
+        "gender": "Male",
+        "admission_type_id": 1,
+        "admission_source_id": 7,
+        "discharge_disposition_id": 6,
+        "medical_specialty": "Cardiology"
+      }
+    }
+  ]
+}

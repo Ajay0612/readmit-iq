@@ -7,7 +7,7 @@ name = "readmit-iq"
 version = "0.1.0"
 description = "Hospital readmission analytics: reproducible data ingestion and inspection"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.13"
 dependencies = [
   "numpy>=2,<3", "pandas>=2.2,<4", "scikit-learn>=1.5,<2",
   "matplotlib>=3.9,<4", "PyYAML>=6,<7", "pydantic>=2,<3",
@@ -27,8 +27,8 @@ modeling = [
   "xgboost>=2", "lightgbm>=4", "catboost>=1.2", "imbalanced-learn>=0.13",
   "shap>=0.46", "optuna>=4", "mlflow>=2.17",
 ]
-api = ["fastapi>=0.115", "uvicorn>=0.30"]
-demo = ["streamlit>=1.40"]
+api = ["fastapi>=0.141,<0.142", "uvicorn>=0.53,<0.54"]
+demo = ["streamlit>=1.64,<1.65"]
 
 [project.scripts]
 readmit-download = "readmit_iq.data.download:main"
@@ -37,9 +37,13 @@ readmit-inspect = "readmit_iq.data.inspect:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"readmit_iq.serving" = ["contract.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+markers = ["real_artifact: integration with the verified ignored frozen model; synthetic inputs only"]
 
 [tool.ruff]
 target-version = "py311"
