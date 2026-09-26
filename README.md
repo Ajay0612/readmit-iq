@@ -5,11 +5,12 @@ Predicting hospital readmission risk to help prioritize limited care-management 
 **Business question:** Which patients should a hospital prioritize at discharge for follow-up
 when its care-management team cannot contact everyone?
 
-**Current status: Phase 5 complete.** The final primary is **uncalibrated logistic regression**,
+**Current status: Phase 6 local demonstration implemented.** The final primary is **uncalibrated logistic regression**,
 with a validation-selected policy to prioritize the **top 10% of eligible discharge encounters**.
 That capacity is an explicit portfolio assumption, not measured hospital staffing. The protocol
 was committed before the one-time final test prediction pass; neither model nor policy changed
-afterward. No prediction service or clinical deployment is implemented.
+afterward. FastAPI, Streamlit and Docker package that same frozen model; clinical deployment
+is not validated. No claim of HIPAA compliance is made.
 
 This is an analytical decision-support portfolio project, not a clinical diagnostic tool.
 
@@ -73,6 +74,49 @@ Read the [final test report](reports/modeling/final_test_report.md),
 [responsible ML report](reports/responsible_ml.md), and executed
 [notebook 05](notebooks/05_explainability_business_impact.ipynb) /
 [notebook 06](notebooks/06_final_test_evaluation.ipynb).
+
+## Local Demo
+
+Restore the trusted, ignored Phase 5 model artifact, then follow the
+[exact Python 3.12 setup](docs/local_demo.md). The model is verified before loading; no training
+or final-test prediction is part of serving.
+
+```bash
+# API environment: requirements-serving.txt + regular local package installation
+make verify-model
+make api                 # http://localhost:8000/docs (Swagger)
+# Another terminal: isolated Streamlit environment
+make install-demo
+make demo                # http://localhost:8501
+# Or stop native servers and run both services with Docker:
+make docker-build
+make docker-run
+```
+
+Use the single-record form or bundled 20-record synthetic batch. Single scores have no outreach
+decision; batch ranking selects exactly `floor(0.10 × N)`, including zero for fewer than ten.
+The original deterministic SHA-256 tie-break is preserved. Maximum: 1,000 records / 1 MiB.
+
+```bash
+curl --fail-with-body http://localhost:8000/v1/predict \
+  -H 'Content-Type: application/json' --data-binary @examples/synthetic/single.json
+curl --fail-with-body http://localhost:8000/v1/prioritize \
+  -H 'Content-Type: application/json' --data-binary @examples/synthetic/batch.json
+```
+
+```mermaid
+flowchart TD
+    A[User / synthetic CSV] --> B[Streamlit or REST client]
+    B --> C[FastAPI: schema and eligibility validation]
+    C --> D[Frozen preprocessing + Logistic Regression]
+    D --> E[Risk probability]
+    E --> F[Optional batch ranking]
+    F --> G[Top 10% portfolio outreach list]
+```
+
+Read the [model card](docs/model_card.md), [deployment and input contract](docs/local_demo.md),
+and [Phase 6 verification](reports/serving/phase6_verification.md). Portfolio demonstration only;
+historical 1999–2008 data, not validated for patient care. No cloud deployment is configured.
 
 The sections below preserve the earlier development evidence; their metrics are labeled by phase.
 
@@ -355,12 +399,13 @@ Platform-only packages use markers.
 Exact pinned versions were tested on Python 3.12/macOS arm64; other Python/platform combinations
 are not verified locally. If a pin is unavailable, resolve `python -m pip install '.[dev]'`
 in a fresh environment and record a separate lock instead of silently changing this one.
-`pyproject.toml` declares direct dependencies, optimization extras and future modeling/API/demo
-extras. The broad future extras are deferred and have not been resolved together or tested.
+`pyproject.toml` declares direct dependencies and optimization/API/demo extras.
+The broad historical modeling extra remains deferred and is not required for serving.
 Phase 3 uses scikit-learn estimators. Phase 4 adds Optuna/local MLflow; Phase 5 adds SHAP
 0.52.0 with slicer/numba/llvmlite without changing earlier pins. No SMOTE, additional booster
-package, API or deployment is implemented. Some web packages are transitive
-MLflow dependencies, not an application service.
+package was added. Phase 6 adds pinned API and isolated UI environments; the original
+`requirements.txt` remains byte-identical because it is protected by the final evaluation lock.
+Use `make install-phase6` for current development tests and `make install-demo` for UI tests.
 
 Use `make download`, `make inspect`, `make notebook`, `make verify`, `make test`, or `make lint`
 for Phase 1 steps. `make eda` rebuilds the cohort/reports/figures; `make eda-notebook` executes
@@ -439,8 +484,8 @@ The `src/readmit_iq` package separates imports from the repository root. A regul
 installation is used because this local macOS environment hides editable-install `.pth` files.
 After modifying source modules, reinstall with `python -m pip install --no-deps --no-build-isolation .`.
 Run commands from the repository root, or set `READMITIQ_CONFIG` to the YAML file's full path.
-APIs and future notebooks are not scaffolded.
-Docker and service CI remain deferred.
+Phase 6 adds the `serving` package, Streamlit app, Docker targets and service CI;
+its [local instructions](docs/local_demo.md) describe artifact restoration and isolation.
 The GitHub repository is [Ajay0612/readmit-iq](https://github.com/Ajay0612/readmit-iq),
 with `main` as the development branch and `origin` as the local remote.
 Only project source, configuration, tests, documentation, executed notebooks, aggregate reports
@@ -455,7 +500,7 @@ for remote execution status. Earlier verification reports describe their origina
 
 `make phase5-development` executes notebook 05 using validation only. `make final-notebook`
 verifies the committed protocol and reviews archived aggregate results. `make phase5` runs
-both notebooks, environment checks, lint, all 196 tests and artifact reconciliation. Notebook
+both notebooks, environment checks, lint, the available test suite and artifact reconciliation. Notebook
 05 stores its validation figure copies in an ignored cache; it cannot overwrite final figures.
 
 The original explicit **`make final-eval`** command was run once after commit `ce2fcdb` froze
@@ -473,10 +518,9 @@ Phase 5 local verification: **196 tests passed**, Ruff and dependency checks pas
 No test record is opened or prediction invoked by the artifact verifier. See the
 [verification record](reports/modeling/phase5/verification.json).
 
-## Phase 6 recommendation
+## Next phase
 
-Next, after separate authorization, package the frozen model into a clearly labeled local
-portfolio demonstration with an explicit batch/input contract. Contemporary external and
-prospective clinical/workflow validation remain separate prerequisites for hospital use.
-Read the [Phase 6 recommendation](reports/modeling/phase6_recommendation.md). No API, Streamlit,
-Docker, production architecture, deployment or final resume work starts automatically.
+Phase 6 packages the frozen Phase 5 model without new modeling decisions or test evaluation.
+The [original Phase 6 recommendation](reports/modeling/phase6_recommendation.md) is retained as
+historical evidence. A separately authorized Phase 7 can polish the portfolio narrative and
+demonstration walkthrough. Cloud hosting and clinical validation remain separate decisions.
