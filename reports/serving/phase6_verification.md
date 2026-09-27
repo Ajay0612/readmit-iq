@@ -86,8 +86,17 @@ production throughput or latency under concurrency. Re-running the benchmark nat
 The workflow retains all earlier notebook and frozen-final protections and adds a separate
 serving job: contract/UI tests, lint, dependency checks, both Docker builds and missing-model
 503 smoke. The ignored real model is absent in CI, so its four integration cases explicitly
-skip. Real-artifact and live UI/container evidence above is local. Remote Phase 6 execution
-will be recorded here after the authorized push and completed Actions run.
+skip. Real-artifact and live UI/container evidence above is local.
+
+The first [serving job](https://github.com/Ajay0612/readmit-iq/actions/runs/36268461774/job/108477707258)
+passed on Linux amd64: **96 passed, 4 intentionally skipped**, both images built, and missing-model
+health/prediction returned 503. Its earlier-phase job exposed a test-scope integration issue:
+the original Phase 4 verifier correctly rejects any skipped test in its evidence. The final
+Make targets retain that unchanged guard and run all **196 earlier tests** for Phase 4/5;
+Phase 6 tests run in the dedicated serving job. The current full-run result is published by
+GitHub below; follow it for the exact commit, both job results and downloadable evidence.
+
+[![CI on main](https://github.com/Ajay0612/readmit-iq/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ajay0612/readmit-iq/actions/workflows/ci.yml?query=branch%3Amain)
 
 Existing dependency deprecation notices (Starlette TestClient/httpx and SHAP colormap methods)
 are non-failing; frozen dependencies were not upgraded to suppress them. The demonstration

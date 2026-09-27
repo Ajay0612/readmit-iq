@@ -185,7 +185,8 @@ final test records or runs `make final-eval`. `make phase6-test` runs serving co
 real-artifact tests skip when absent, and UI tests run separately when Streamlit is absent.
 `READMITIQ_REQUIRE_REAL_MODEL=1` makes missing real weights an integration-test failure.
 
-CI retains earlier notebook/freeze checks. Its separate serving job runs mocked contract/UI
+CI retains earlier notebook/freeze checks and all 196 earlier tests with zero skips in the
+Phase 4/5 verification reports. Its separate serving job runs mocked contract/UI
 tests and loader rejection tests, builds both images, and verifies missing-model 503 behavior.
 Its fixture explicitly reports `artifact_verified: false` and `contract-test-double`.
 It does not claim real-model inference success. The real binary smoke/parity checks are local.

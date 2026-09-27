@@ -461,16 +461,20 @@ are documented in `.env.example`. The frozen split and estimator seed is 42.
 configs/                     Source/cohort contracts, split, baseline and optimization policies
 data/{raw,interim,processed}/ Verified raw; ignored cohort and compressed frozen partitions
 docs/                        Dataset selection and source dictionary
+app/                         Streamlit UI calling the local FastAPI service
+examples/synthetic/          Hand-authored JSON and CSV demonstration inputs
 notebooks/                   Executed notebooks 01–06
 src/readmit_iq/data/          Download, load, validate and inspect modules
 src/readmit_iq/analysis/      Feature audit, patient-cluster statistics, reports and plots
 src/readmit_iq/modeling/      Splits, features, encoders, pipelines, training and validation
 src/readmit_iq/optimization/  Group CV, Optuna, calibration, local tracking and development selection
 src/readmit_iq/decision_support/ Ranking, SHAP, uncertainty, subgroup and frozen final evaluation
+src/readmit_iq/serving/       Verified loader, strict API schemas, eligibility and batch ranking
 reports/data_quality/        Raw checks, cohort report, feature audit and missingness decisions
 reports/eda/                 Reproducible descriptive tables and summary JSON
 reports/figures/eda/          Seven reviewed EDA figures
 reports/modeling/            Frozen manifest, feature policy and validation results
+reports/serving/             Synthetic parity, container and latency verification
 reports/figures/modeling/    Four baseline figures plus six Phase 4 figures
 reports/figures/phase5/       Eight reviewed explanation/operational/final-result figures
 scripts/                     Environment verification and notebook execution
@@ -478,6 +482,7 @@ tests/                       Source, cohort, split, feature, encoding and model-
 models/development/          Ignored experimental pipelines and validation/test prediction caches
 models/final/                Ignored byte-identical frozen primary and metadata
 mlruns/phase4/               Ignored local SQLite experiment tracking
+Dockerfile / docker-compose.yml  Separate API and UI images; read-only model mount
 ```
 
 The `src/readmit_iq` package separates imports from the repository root. A regular package
@@ -500,7 +505,7 @@ for remote execution status. Earlier verification reports describe their origina
 
 `make phase5-development` executes notebook 05 using validation only. `make final-notebook`
 verifies the committed protocol and reviews archived aggregate results. `make phase5` runs
-both notebooks, environment checks, lint, the available test suite and artifact reconciliation. Notebook
+both notebooks, environment checks, lint, the 196 earlier-phase tests and artifact reconciliation. Notebook
 05 stores its validation figure copies in an ignored cache; it cannot overwrite final figures.
 
 The original explicit **`make final-eval`** command was run once after commit `ce2fcdb` froze

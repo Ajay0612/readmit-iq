@@ -45,7 +45,7 @@ optimization-reports:
 optimization-notebook:
 	$(PYTHON) scripts/execute_notebook.py notebooks/04_model_optimization.ipynb --timeout 3600
 phase4: optimization-notebook verify lint
-	$(PYTHON) -m pytest --junitxml=.cache/phase4-tests.xml
+	$(PYTHON) -m pytest --ignore=tests/serving --junitxml=.cache/phase4-tests.xml
 	$(PYTHON) scripts/verify_phase4.py
 phase5-development:
 	$(PYTHON) scripts/execute_notebook.py notebooks/05_explainability_business_impact.ipynb --timeout 1800
@@ -55,9 +55,11 @@ final-eval:
 final-notebook:
 	$(PYTHON) scripts/execute_notebook.py notebooks/06_final_test_evaluation.ipynb --timeout 300
 phase5: phase5-development final-notebook verify lint
-	$(PYTHON) -m pytest --junitxml=.cache/phase5-tests.xml
+	$(PYTHON) -m pytest --ignore=tests/serving --junitxml=.cache/phase5-tests.xml
 	$(PYTHON) scripts/verify_phase5.py
 
+# Phase 4/5 retain their no-skip historical test evidence. Serving tests have their
+# own target/job because their real-artifact and UI dependencies can be absent.
 # Phase 6 never trains a model or scores the held-out test set.
 install-phase6:
 	$(PYTHON) -m pip install -r requirements-phase6.txt
