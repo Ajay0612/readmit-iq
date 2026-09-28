@@ -1,531 +1,263 @@
 # ReadmitIQ
 
-Predicting hospital readmission risk to help prioritize limited care-management outreach.
+**Predicting 30-Day Hospital Readmission Risk to Prioritize Care-Management Outreach**
 
-**Business question:** Which patients should a hospital prioritize at discharge for follow-up
-when its care-management team cannot contact everyone?
+When follow-up capacity is limited, which discharge encounters should a care-management team
+review first? ReadmitIQ connects a patient-grouped modeling study to an explicit outreach
+capacity scenario and a tested local FastAPI/Streamlit demonstration. It combines statistical
+evaluation, explainability and error analysis with a frozen inference pipeline.
 
-**Current status: Phase 6 local demonstration implemented.** The final primary is **uncalibrated logistic regression**,
-with a validation-selected policy to prioritize the **top 10% of eligible discharge encounters**.
-That capacity is an explicit portfolio assumption, not measured hospital staffing. The protocol
-was committed before the one-time final test prediction pass; neither model nor policy changed
-afterward. FastAPI, Streamlit and Docker package that same frozen model; clinical deployment
-is not validated. No claim of HIPAA compliance is made.
+**The result:** prioritizing the highest-risk **10%** of eligible discharge encounters
+identified **23.54%** of recorded readmissions, achieving **2.36× lift** over random targeting.
+This is a retrospective portfolio scenario: surfaced events, not prevented readmissions.
 
-This is an analytical decision-support portfolio project, not a clinical diagnostic tool.
+[![CI](https://github.com/Ajay0612/readmit-iq/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ajay0612/readmit-iq/actions/workflows/ci.yml)
 
-## Final results and operational interpretation
+[Results](#at-a-glance) · [Business impact](#business-impact) · [Methodology](#methodology)
+· [Demo walkthrough](docs/demo_walkthrough.md) · [Case study](docs/project_case_study.md)
+· [Run locally](#installation-and-reproduction)
 
-The eligible cohort contains **90,702 encounters from 65,044 patients**. Patient-grouped
-train/validation/test partitions have **zero patient overlap**. On 13,549 final test encounters:
+## At a glance
 
-| Frozen primary metric | Validation | Final test | Test patient-bootstrap 95% interval |
-|---|---:|---:|---:|
-| Average precision | 0.19678 | **0.20837** | 0.18704–0.23285 |
-| ROC-AUC | 0.65459 | **0.65181** | 0.63515–0.66929 |
-| Brier | 0.095065 | **0.094101** | 0.089817–0.098295 |
-| Recall at top 10% | 21.41% | **23.54%** | 21.29–25.91% |
-| Precision at top 10% | 23.62% | **25.85%** | 22.81–28.89% |
-| Lift over random outreach | 2.14× | **2.36×** | 2.13–2.59× |
+| Scope / metric | Verified result |
+|---|---:|
+| Eligible historical encounters | **90,702** |
+| Patients | **65,044** |
+| Final test encounters | 13,549 |
+| Average precision (AP) | **0.20837** |
+| ROC-AUC | **0.65181** |
+| Brier score | 0.094101 |
+| Recall at top 10% | **23.54%** |
+| Precision at top 10% | **25.85%** |
+| Lift over random targeting | **2.36×** |
 
-The policy prioritizes **1,354 encounters from 863 unique historical people**, capturing
-**350 of 1,487 recorded readmissions**, with 1,004 false positives and 1,137 false negatives.
-Unique people are deduplicated historical counts, not simultaneous caseload. Rank scores
-within an available batch, select `floor(10% × N)` and break ties deterministically without
-outcomes. The corresponding probability cutoff varies with the unlabeled batch.
+Metrics are **retrospective held-out test results** for the frozen logistic model. Patient
+overlap across train/validation/test is zero. Earlier full-cohort EDA means this was not a
+fully untouched confirmatory study. [Final report and uncertainty](reports/modeling/final_test_report.md).
 
-**Illustrative operational result:** per 10,000 eligible discharges, about 1,000 outreach
-encounters surface **258 readmissions versus 110 under random targeting**—about **149 additional
-surfaced events** and 3.87 contacts per surfaced event. This scales retrospective encounter
-yield; it estimates no prevented readmissions, intervention effect or savings.
+**Important failure mode:** recall was **7.6% without prior inpatient use**, versus **39.6%
+with prior use**. Low scores do not establish low clinical need. Historical 1999–2008 data
+and unresolved workflow/validation gaps rule out claims of clinical readiness.
 
-![Readmissions concentrated in higher-risk discharges](reports/figures/phase5/02_cumulative_gains.png)
+## Business problem and solution
 
-**Why logistic?** Boosting's validation AP advantage was only +0.00194, with a paired
-patient-bootstrap interval spanning zero. Logistic retained comparable discrimination with
-simpler interpretation. The final model uses L2/lbfgs, `C=0.09988151348099303`, no class weights,
-seed 42, four original numeric counts/stay features and six categorical discharge-context
-features. Original training-fitted scaling and encoders remain unchanged; no train+validation
-refit or probability recalibration was performed. Exact parameters and preprocessing are in
-the [frozen specification](reports/modeling/final_model_specification.json).
+The practical question is how to allocate a limited review queue. The project estimates
+recorded readmission risk after discharge destination is confirmed, then ranks an available
+batch under an **assumed 10% outreach capacity**. That assumption is not a hospital policy.
 
-**Strongest drivers:** prior inpatient use and discharge destination, followed by age,
-admission source and specialty. Numeric coefficients use original units; categorical odds
-ratios use explicit within-field contrasts. Linear SHAP and verified actual-booster permutation
-SHAP explain predictive associations, not causes. Three anonymous validation examples show how
-different histories can raise risk and why a low score does not guarantee no readmission.
+The work spans source validation, cohort/feature auditing, EDA, group-aware model development,
+uncertainty analysis, explainability, business interpretation and API packaging. The final
+model is uncalibrated logistic regression with ten approved predictors. The local demo uses
+the original model and training-fitted preprocessing; it does not train a replacement.
 
-![Frozen model feature influence](reports/figures/phase5/05_global_feature_influence.png)
+## Key findings
 
-**Main limitation:** half of test readmissions have no prior inpatient history. At the frozen
-capacity, their recall is only **7.6%**, versus **39.6%** with prior use. Of the 57 captured
-no-history events, 56 involve rehabilitation destination code 22. Demographic estimates use
-minimum-size rules and patient-cluster intervals; no fairness or subgroup-calibration
-certification is claimed. The historical 1999–2008 diabetes cohort, incomplete outside-hospital
-follow-up, unverified field-arrival times and absent prospective intervention evidence prevent
-direct clinical deployment. Earlier full-cohort EDA exposed eventual test outcomes indirectly;
-this is a held-out model evaluation, not a fully untouched confirmatory study.
+**A small review queue concentrates events, but misses most readmissions.** The frozen test
+policy selected 1,354 encounters and surfaced 350 of 1,487 recorded readmissions. The remaining
+1,137 events were outside that queue.
 
-Read the [final test report](reports/modeling/final_test_report.md),
-[committed pretest protocol](reports/modeling/final_evaluation_protocol.md),
-[validation policy and capacity tables](reports/modeling/operational_policy_report.md),
-[explanations](reports/modeling/explainability_report.md),
-[deep error analysis](reports/modeling/validation_error_analysis.md),
-[responsible ML report](reports/responsible_ml.md), and executed
-[notebook 05](notebooks/05_explainability_business_impact.ipynb) /
-[notebook 06](notebooks/06_final_test_evaluation.ipynb).
+[![Cumulative gains: the highest-risk 10% captures 23.5% of test readmissions, above the random-targeting diagonal.](reports/figures/phase5/02_cumulative_gains.png)](reports/figures/phase5/02_cumulative_gains.png)
 
-## Local Demo
+*Validation and final-test gains. Dots mark 10% capacity; the dashed line is random targeting.
+Encounter counts are not simultaneous caseload. Select any chart to view its original.*
 
-Restore the trusted, ignored Phase 5 model artifact, then follow the
-[exact Python 3.12 setup](docs/local_demo.md). The model is verified before loading; no training
-or final-test prediction is part of serving.
+**Risk estimates support ranking, not diagnosis.** Test AP was 0.20837 against approximately
+11% prevalence. Precision at the chosen capacity was 25.85%: most selected encounters still
+had no recorded readmission.
 
-```bash
-# API environment: requirements-serving.txt + regular local package installation
-make verify-model
-make api                 # http://localhost:8000/docs (Swagger)
-# Another terminal: isolated Streamlit environment
-make install-demo
-make demo                # http://localhost:8501
-# Or stop native servers and run both services with Docker:
-make docker-build
-make docker-run
-```
+[![Precision-recall curves: test AP is 0.208 and validation AP is 0.197; the top-10% test point has 23.54% recall and 25.85% precision.](reports/figures/phase5/01_precision_recall.png)](reports/figures/phase5/01_precision_recall.png)
 
-Use the single-record form or bundled 20-record synthetic batch. Single scores have no outreach
-decision; batch ranking selects exactly `floor(0.10 × N)`, including zero for fewer than ten.
-The original deterministic SHA-256 tie-break is preserved. Maximum: 1,000 records / 1 MiB.
+*Dots identify the capacity policy, not a universal probability threshold. These are saved
+curves; final-test predictions were not rerun for this presentation.*
 
-```bash
-curl --fail-with-body http://localhost:8000/v1/predict \
-  -H 'Content-Type: application/json' --data-binary @examples/synthetic/single.json
-curl --fail-with-body http://localhost:8000/v1/prioritize \
-  -H 'Content-Type: application/json' --data-binary @examples/synthetic/batch.json
-```
+## Methodology
+
+| Decision | Implementation and reasoning |
+|---|---|
+| Cohort and target | UCI diabetes inpatient encounters; `<30` is positive, `>30`/`NO` negative. Apply documented discharge exclusions. |
+| Evaluation units | Patient-grouped train/validation/test: **63,563 / 13,590 / 13,549 encounters**, with zero patient overlap. |
+| Predictors | Stay length; prior inpatient, emergency and outpatient counts; age, gender, admission type/source, discharge destination and specialty. |
+| Preprocessing | Training-fitted scaling, missing-category normalization, rare-category pooling and encoding, fitted inside each training fold. |
+| Development | Prevalence baseline, logistic regression, random forest and histogram gradient boosting; five patient-disjoint training CV folds and bounded Optuna searches. |
+| Selection | AP, paired patient-bootstrap uncertainty, Brier/calibration, complexity and a prespecified primary/challenger rule. |
+| Final evaluation | Commit the model/policy protocol first; score the held-out test once; preserve aggregate publication hashes. |
+
+IDs, outcomes and future patient aggregates never enter the feature matrix. Race is audit-only;
+diagnoses, medication/lab fields and payer are excluded from the final model. The extract cannot
+verify workflow arrival times. [Feature policy](reports/modeling/final_feature_policy.md)
+· [Split contract](reports/modeling/data_split_report.md).
+
+### Why logistic regression?
+
+Boosting's validation AP advantage was only **+0.00194**, with a paired patient-bootstrap 95%
+interval of **−0.00427 to +0.00839**. It had better Brier and CV stability, but did not clear the
+prespecified AP/uncertainty margin for greater complexity. Logistic offered similar
+discrimination and simpler interpretation; **this is not a statistical-equivalence claim**.
+
+Class weighting worsened probability quality in baseline experiments. Sigmoid calibration
+provided negligible improvement; logistic isotonic calibration improved Brier slightly but
+reduced AP by 0.00600. Neither met the retention rule. The frozen primary retains L2/lbfgs,
+`C=0.09988151348099303`, seed 42, no class weights and no recalibration.
+[Selection](reports/modeling/model_selection_report.md) · [Calibration](reports/modeling/calibration_report.md).
+
+## Business impact
+
+At the observed test mix, **10,000 eligible discharges** and about **1,000 outreach encounters**
+surface approximately **258 recorded readmissions versus 110 under random targeting**—about
+**149 additional surfaced events** at the same assumed capacity.
+
+[![Operational scenario: model targeting surfaces about 258 recorded readmissions per 10,000 eligible discharges versus 110 with random outreach.](reports/figures/phase5/04_operational_scenario.png)](reports/figures/phase5/04_operational_scenario.png)
+
+*Retrospective encounter-level yield, scaled from the archived test result. This estimates
+neither prevention, savings, intervention effectiveness nor unique people contacted.*
+
+The rule is exact: rank unrounded risk, apply the original SHA-256 tie-break, and select
+`floor(0.10 × N)`. Fewer than ten encounters select zero. A single score has no batch-relative
+outreach decision. [Policy](reports/modeling/operational_policy_report.md)
+· [Scenario calculation](reports/modeling/phase5/test/business_scenario.json).
+
+## Explainability
+
+**Prior inpatient use and discharge destination are the strongest documented drivers.** Age,
+admission source and specialty also contribute. The model combines encounter information
+through additive effects on log odds, then converts the result to a probability.
+
+[![Global SHAP influence: prior inpatient visits and discharge destination dominate; age, admission source and specialty follow.](reports/figures/phase5/05_global_feature_influence.png)](reports/figures/phase5/05_global_feature_influence.png)
+
+*Validation explanations: logistic SHAP across validation on the left; a shared 256-encounter
+comparison on the right. These explain associations, not causes or treatment effects.*
+
+The [explainability report](reports/modeling/explainability_report.md) includes existing anonymous
+validation illustrations. Those are historical analytical examples; the separate demo examples
+are hand-authored synthetic records.
+
+## Limitations that affect the decision
+
+**The model misses many readmissions without recorded inpatient history.** That group contains
+half of final-test readmissions, yet recall is only 7.6%. Of its 57 captured events, 56 involve
+rehabilitation destination code 22. This dependence deserves investigation, not reassurance.
+
+[![Recall by prior use and demographic groups: test recall is 7.6% without prior inpatient use and 39.6% with any prior use; patient-cluster intervals show uncertainty.](reports/figures/phase5/07_subgroup_recall.png)](reports/figures/phase5/07_subgroup_recall.png)
+
+*Original group definitions and suppression rules remain fixed. Groups overlap; small groups
+and wide intervals prevent fairness or subgroup-calibration certification.*
+
+Other limits include the selected **1999–2008 diabetes population**, incomplete outside-hospital
+follow-up, unavailable temporal/site validation, unverified feature timing, earlier full-cohort
+EDA, and no prospective intervention evidence. Bootstrap intervals omit retraining/selection
+uncertainty. This is a **portfolio demonstration, not a clinically validated system**. No claim
+of HIPAA compliance is made. [Model card](docs/model_card.md)
+· [Responsible ML assessment](reports/responsible_ml.md).
+
+## Interactive demonstration
+
+Explore the [two-minute walkthrough](docs/demo_walkthrough.md), including a short recording
+of the running local application using **synthetic inputs only**. There is no public inference
+deployment. Running it yourself requires the trusted frozen model artifact.
+
+Streamlit calls FastAPI for single risk estimates or CSV batch ranking. A single response has
+`outreach_selected: null`; the bundled 20-record batch selects two. Swagger documents strict
+input/eligibility validation and sanitized errors. Docker separates the API and UI; startup
+verifies model bytes. API limits are 1,000 records / 1 MiB.
+
+**Engineering evidence:** 296 local tests passed in Phase 6, including four real-artifact
+integration tests. Synthetic service/direct-pipeline probabilities matched exactly. CI uses
+explicit contract doubles, builds both images and rejects missing artifacts; it does not claim
+to possess the ignored model. [Serving verification](reports/serving/phase6_verification.md).
+
+## Architecture
+
+**Analytical development — completed and frozen**
 
 ```mermaid
+---
+config:
+  flowchart:
+    rankSpacing: 18
+    padding: 8
+    wrappingWidth: 280
+---
 flowchart TD
-    A[User / synthetic CSV] --> B[Streamlit or REST client]
-    B --> C[FastAPI: schema and eligibility validation]
-    C --> D[Frozen preprocessing + Logistic Regression]
+    A[Historical UCI dataset] --> B[Data validation]
+    B --> C[Cohort preparation and EDA]
+    C --> D[Patient-grouped split]
+    D --> E[Training-fold preprocessing]
+    E --> F[Model development and selection]
+    F --> G[Frozen Logistic Regression]
+    G --> H[One-time test: archived evidence]
+```
+
+**Serving — consumes the frozen artifact**
+
+```mermaid
+---
+config:
+  flowchart:
+    rankSpacing: 18
+    padding: 8
+    wrappingWidth: 240
+---
+flowchart TD
+    A[Streamlit or REST client] --> B[FastAPI]
+    B --> C[Validate schema and eligibility]
+    C --> D[Verified frozen pipeline]
     D --> E[Risk probability]
-    E --> F[Optional batch ranking]
-    F --> G[Top 10% portfolio outreach list]
+    E --> F[Single: no outreach decision]
+    E --> G[Batch: rank and break ties]
+    G --> H[Select floor of 10 percent]
 ```
 
-Read the [model card](docs/model_card.md), [deployment and input contract](docs/local_demo.md),
-and [Phase 6 verification](reports/serving/phase6_verification.md). Portfolio demonstration only;
-historical 1999–2008 data, not validated for patient care. No cloud deployment is configured.
+## Installation and reproduction
 
-The sections below preserve the earlier development evidence; their metrics are labeled by phase.
+**Explore without installing:** all six [executed notebooks](notebooks/) and aggregate reports
+are committed. Start with the [case study](docs/project_case_study.md) or
+[final evaluation](notebooks/06_final_test_evaluation.ipynb).
 
-## Data understanding
-
-| Measure | Raw source | Eligible cohort |
-|---|---:|---:|
-| Hospital encounters | 101,766 | 90,702 |
-| Unique patients | 71,518 | 65,044 |
-| `<30` readmission labels | 11,357 (11.16%) | 10,054 (11.08%) |
-| Negative labels (`>30` / `NO`) | 90,409 | 80,648 |
-| Patients with multiple encounters | 16,773 | 14,563 |
-| Encounters from repeat patients | 46.21% | 44.34% |
-| Missing weight | 96.86% | 96.68% |
-| Missing medical specialty | 49.08% | 48.28% |
-| Missing payer code | 39.56% | 36.48% |
-
-The source has 50 columns (47 candidate features, two IDs and the outcome), with zero duplicate
-rows or encounter IDs. Raw bytes remain unchanged. The analytical copy retains every original
-column, normalizes literal `?` to missing and adds the validated binary target. Lab `None` means
-not measured and is preserved. This analytical copy has no learned transformations; Phase 3
-preprocessing is fitted separately on training data only.
-
-**Cohort:** remove 11,064 encounters: 1,652 death-coded, 771 hospice, 3,874 continued inpatient
-transfers, 87 without confirmed discharge and 4,680 unknown destinations. Hospice requires a
-separate care-goal pathway; it is not assumed incapable of readmission. Selected postacute
-destinations remain eligible for coordinated outreach. The mixed rehabilitation category and
-unknown-destination policy have explicit sensitivity analyses in the
-[cohort report](reports/data_quality/cohort_report.md) and reusable rules in
-[phase2.yaml](configs/phase2.yaml).
-
-**Observed associations in the eligible cohort:**
-
-- Prior inpatient use: 26.20% readmission for 3+ visits versus 8.34% for none; difference
-  **17.85 percentage points** (95% patient-cluster interval 16.44–19.27).
-- Prior emergency use: 25.40% for 3+ visits versus 10.34% for none. Outpatient use levels off;
-  keep the three counts separate. Exact-count tails are not strictly monotonic.
-- Length of stay: 13.44% for 8–14 days versus 9.08% for 1–2 days. Medication-count rates rise
-  from 8.61% at 1–9 to 13.00% at 20–29 and level off at 12.79% for 30+.
-- Rehabilitation discharges: 27.70% versus 9.30% at home. This is a care-setting association,
-  not evidence that changing destination changes risk; mixed rehab settings need workflow review.
-
-![Prior utilization and observed readmission](reports/figures/eda/02_prior_utilization.png)
-
-**Missingness:** initially omit weight (only 3,013 observed eligible values); retain explicit
-Unknown for specialty/payer, with no claim that missingness is random. Preserve lab Not measured
-separately. All 50 fields, including timing-sensitive diagnoses, medications and disposition,
-are reviewed in the [feature audit](reports/data_quality/feature_audit.md).
-
-![Eligible-cohort missingness](reports/figures/eda/07_missingness.png)
-
-**Evaluation design:** repeat patients have a 19.51% encounter readmission rate versus 4.37%
-for single-encounter patients. Full-dataset repeat status is future-informed and cannot be a
-predictor. Under hypothetical independent encounter allocation, 37.21% of test encounters
-would share a patient with training. Phase 3 implements the **70/15/15 split by patient, seed 42**,
-with approximate outcome/group-size stratification and zero overlap. Preprocessing fits training
-only; test was frozen before modeling. No dates or hospital IDs support temporal/site validation.
-Full-cohort EDA already examined outcomes: the frozen test is isolated from subsequent fitting
-and tuning, but is not a fully unseen confirmatory sample.
-
-Read the [raw-data report](reports/data_quality/raw_data_report.md),
-[executed notebook](notebooks/01_data_understanding.ipynb),
-[dataset comparison and limitations](docs/dataset_selection.md), and
-[data dictionary](docs/data_dictionary.md).
-
-Phase 2: [executed EDA notebook](notebooks/02_eda.ipynb),
-[missingness decisions](reports/data_quality/missingness_strategy.md),
-[split design](reports/modeling/split_strategy.md),
-[cleaning contract](reports/modeling/cleaning_strategy.md), and
-[feature-engineering discovery plan](reports/feature_engineering_plan.md).
-
-Phase 2 validation: **38 tests passed**, all 11 EDA code cells executed with zero error outputs,
-and Ruff/environment checks passed. The [verification record](reports/eda/verification.json)
-includes raw-integrity checks, table reconciliation and reviewed figure hashes.
-
-## Modeling methodology and development results
-
-Score at **confirmed discharge**, before the outreach list is finalized. Primary inputs are
-age band, gender, admission type/source, admitting specialty, confirmed destination, length
-of stay and the three provided prior-year utilization counts. The total and any-use indicators
-were tested as additions. IDs, targets, future patient aggregates, constants, sparse weight and
-race are excluded from predictors; race is retained for audit. Final diagnoses, billing and
-full-stay treatment/lab summaries remain separate timing-sensitive experiments.
-
-| Partition | Encounters | Patients | Positives | Prevalence |
-|---|---:|---:|---:|---:|
-| Train | 63,563 | 45,530 | 7,068 | 11.120% |
-| Validation | 13,590 | 9,757 | 1,499 | 11.030% |
-| Test (evaluated in Phase 5) | 13,549 | 9,757 | 1,487 | 10.975% |
-
-Every eligible patient and encounter belongs to one partition. Test counts above are the
-allocation diagnostics saved at freeze time; final performance is reported above. Compressed CSV artifacts
-are ignored by Git; committed hashes ensure deterministic reproduction without adding a
-Parquet dependency. Development loaders reject test access.
-
-Linear models use standardized numeric counts and training-pooled one-hot categories.
-Forest uses unscaled counts; histogram boosting uses native categorical splits. Rare levels
-are learned from training only, with safe unseen-category handling. Numeric counts are complete,
-so no numeric imputer is fitted. Diagnosis ranges are centralized and tested; medication-count
-derivations distinguish No from Steady/Up/Down. No future encounter history is fabricated.
-
-**Phase 3 validation only; fixed first-pass settings:**
-
-| Model | Average precision | ROC-AUC | Brier |
-|---|---:|---:|---:|
-| Histogram gradient boosting | 0.202 | 0.662 | 0.0945 |
-| Random forest | 0.197 | 0.658 | 0.0947 |
-| Logistic regression | 0.194 | 0.653 | 0.0951 |
-| Logistic, balanced weights | 0.194 | 0.654 | 0.2258 |
-| Prevalence baseline | 0.110 | 0.500 | 0.0981 |
-
-![Fixed validation comparison](reports/figures/modeling/01_model_comparison.png)
-
-Prior utilization adds **0.039 AP** to logistic (95% paired patient-bootstrap interval
-0.027–0.055). Adding total/any-use terms beyond raw counts gives **−0.002 AP**, with no
-demonstrated improvement; start the next logistic reference from separate raw counts.
-Disposition adds 0.014 AP under the confirmed-destination contract. Diagnosis grouping is
-more compact than raw coding, but its superiority is not established and timing remains uncertain.
-
-Boosting's gain over matched logistic is modest: **+0.0079 AP** (0.0015–0.0143). Forest's
-advantage is inconclusive. Balanced weighting raises recall at the reference threshold 0.50,
-but mean predicted risk becomes 46.53% against 11.03% observed, substantially worsening Brier.
-At 0.50, boosting detects only 7 of 1,499 events. At Phase 3, an operational outreach threshold had **not**
-been chosen. These historical results precede the Phase 5 capacity decision.
-
-Read the [executed baseline notebook](notebooks/03_feature_engineering_and_baselines.ipynb),
-[scoring-time contract](reports/modeling/scoring_time_contract.md),
-[split report](reports/modeling/data_split_report.md),
-[feature manifest](reports/modeling/model_feature_manifest.md),
-[full comparison and error analysis](reports/modeling/baseline_model_report.md), and
-[Phase 4 recommendation](reports/modeling/phase4_recommendation.md).
-
-Phase 3 validation: **93 tests passed** (all 38 existing plus 55 new), all 10 notebook code
-cells executed, and Ruff/environment/dependency checks passed. Four charts were visually
-reviewed. Reloading all 11 saved pipelines reproduced their validation predictions and metrics;
-frozen data hashes stayed unchanged. See the [verification record](reports/modeling/phase3_verification.json).
-
-## Phase 4 optimization and development selection
-
-Five `StratifiedGroupKFold` folds use seed 42 and deterministic encounter ordering within the
-63,563 training encounters. Every patient's encounters stay in one fold; all fit/holdout overlaps
-are zero. Preprocessing fits inside training folds. AP is primary because positive prevalence is
-about 11%; a constant-score baseline has AP equal to prevalence. Fold SD describes variability,
-not an independent confidence interval. Feature selection and tuning reuse folds, so selected
-CV scores are optimistic and are not nested-CV performance estimates.
-
-The [protocol](reports/modeling/phase4_protocol.md) and [configuration](configs/phase4.yaml)
-were committed before fitting. Sequential seeded Optuna completed **15 logistic and 30 boosting
-trials**, stopping at the prespecified training-CV plateau. Maximum budgets were 30 and 50.
-Logistic tunes unweighted L2 strength; boosting tunes learning rate, iterations, leaf count,
-minimum leaf size and L2. Random forest is one fixed reference. No SMOTE was used.
-
-| Development candidate | CV AP mean ± SD | Validation AP | Validation ROC-AUC | Validation Brier |
-|---|---:|---:|---:|---:|
-| Logistic — primary | 0.21243 ± 0.00768 | 0.19678 | 0.65459 | 0.095065 |
-| Histogram boosting — challenger | 0.22021 ± 0.00527 | 0.19872 | 0.66149 | 0.094604 |
-| Fixed forest reference | 0.21760 ± 0.00537 | 0.19969 | 0.66023 | 0.094797 |
-
-Both selected families retain **core allowed inputs + raw utilization counts**. Logistic uses
-`C=0.0998815`, L2/lbfgs. Boosting uses `learning_rate=0.0493858`, `max_iter=75`,
-`max_leaf_nodes=15`, `min_samples_leaf=50`, `l2_regularization=30`, `max_bins=255`,
-with internal early stopping disabled. Exact parameters and fold metrics are in the
-[tuning report](reports/modeling/tuning_report.md).
-
-Raw + engineered utilization changed fixed-setting CV AP by −0.00107 for logistic and +0.00097
-for boosting; the latter did not clear the prespecified 0.001 complexity margin. Indicators alone
-lost about 0.026–0.030 AP. Grouped diagnoses improved boosting's training CV AP by about 0.0053;
-raw codes did not. Logistic diagnosis differences were small. Timing remains unverified, so all
-diagnosis experiments stay training-only sensitivities and are ineligible for the primary model.
-
-**Tuning did not materially improve Phase 3 validation performance.** Logistic changed by
-+0.00037 AP versus the Phase 3 raw-count reference; boosting changed by −0.00346 versus the
-Phase 3 booster (which used raw + engineered counts). Both paired intervals include zero.
-Parameters were not altered after inspecting validation results.
-
-All seven fitted candidates were sealed before one validation prediction pass. Sigmoid and
-isotonic use training-only cross-fitted calibration with patient-disjoint folds. Logistic isotonic
-improved Brier by 0.000236 but reduced AP by 0.00600; sigmoid's Brier improvement was negligible.
-Neither boosting calibrator qualified. **Both selected models remain uncalibrated** under the
-prespecified Brier-improvement, uncertainty and AP-preservation rule. See the
-[calibration report](reports/modeling/calibration_report.md).
-
-Boosting's validation AP advantage is **+0.00194**, with a 95% paired patient-bootstrap interval
-**[−0.00427, +0.00839]** from 1,000 patient resamples. Its Brier is better, but the AP evidence
-does not clear the prespecified complexity margin. Logistic therefore becomes primary; boosting's
-better CV stability and Brier support retaining it as challenger. These are development choices,
-not equivalence claims or clinical utility estimates.
-
-![Development validation precision-recall curves](reports/figures/modeling/phase4/02_validation_precision_recall.png)
-
-At illustrative logistic thresholds **0.10 / 0.20**, recall is **60.6% / 16.2%**, precision
-**16.3% / 26.8%**, and **41.0% / 6.7%** of validation encounters are flagged. Unique historical
-patients flagged are **3,608 / 588**; they are not a simultaneous outreach caseload. No threshold
-was selected in Phase 4. At 0.10, recall is 35.2% with no prior inpatient use versus 88.2% with any prior use.
-Limited demographic checks retain missingness and suppress small groups; they establish no
-fairness or causal conclusion.
-
-Read [notebook 04](notebooks/04_model_optimization.ipynb), the
-[development selection report](reports/modeling/model_selection_report.md),
-[structured outputs](reports/modeling/phase4/), and
-[Phase 5 recommendation](reports/modeling/phase5_recommendation.md).
-Local verification: **158 tests passed**, all **13 notebook code cells** executed with zero
-errors, six figures visually reviewed, Ruff/dependency checks passed, frozen hashes unchanged,
-and saved predictions reused without rescoring. The
-[Phase 4 verification record](reports/modeling/phase4/verification.json) records the evidence.
-
-Validation has informed earlier feature development, calibration and model selection. Bootstrap
-intervals condition on fitted candidates and exclude retraining/selection uncertainty. Earlier
-full-cohort EDA also exposed eventual test outcomes indirectly. These limitations, historical data,
-uncertain field arrival times and incomplete outside-hospital follow-up limit generalization.
-
-## Dataset
-
-[UCI Diabetes 130-US Hospitals, 1999–2008](https://doi.org/10.24432/C5230J),
-by Clore, Cios, DeShazo and Strack (2014), licensed CC BY 4.0. Chosen after comparing
-MIMIC-IV, HCUP NRD and Synthea for target fit, access and reproducibility.
-The population is selected inpatient encounters with diabetes, not all hospital patients.
-
-The validated positive label is `readmitted == '<30'`. `>30` and `NO` are negative.
-`NO` means no recorded readmission, which does not ensure complete follow-up elsewhere.
-The source categories do not allow the exact day-30 boundary to be independently verified.
-
-## Reproduce the executed work
-
-For a fresh checkout, from the repository root on macOS/Linux (Python 3.11+; verified with 3.12.2):
+**Run the API locally** with Python **3.12**, from a clone:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m pip install --no-deps --no-build-isolation .
-make phase1
-make phase2
-make phase3
-make phase4
-make phase5
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements-serving.txt
+.venv/bin/python -m pip install --no-deps --no-build-isolation .
+# Restore the original trusted model to models/final/readmit_iq_logistic.joblib.
+make verify-model
+make api
 ```
 
-On Windows, activate with `.venv\Scripts\Activate.ps1` and use the equivalent commands:
+The binary is excluded from Git. **A fresh clone alone cannot run real-model inference.**
+Obtain the original artifact from the owner or a trusted Phase 5 backup; do not retrain a
+replacement or change its expected hash. [Exact setup](docs/local_demo.md).
 
-```bash
-python -m readmit_iq.data.download
-python -m readmit_iq.data.inspect
-python scripts/execute_notebook.py
-python scripts/execute_notebook.py notebooks/02_eda.ipynb
-python scripts/execute_notebook.py notebooks/03_feature_engineering_and_baselines.ipynb
-python scripts/execute_notebook.py notebooks/04_model_optimization.ipynb --timeout 3600
-python scripts/verify_environment.py
-python -m pip check
-python -m pytest --junitxml=.cache/phase4-tests.xml
-python scripts/verify_phase4.py
-```
+| Explore | Commands after prerequisites |
+|---|---|
+| API and Swagger | `make api` → `http://localhost:8000/docs` on your machine |
+| Streamlit, separate terminal | `make install-demo`, then `make demo` → `http://localhost:8501` |
+| Docker API + UI | Stop native servers; `make docker-build`, then `make docker-run`; stop with `make docker-stop` |
+| Serving tests | `make install-phase6`, then `make phase6-test` |
+| Complete local engineering verification | `make install-phase6`, `make install-demo`, then `make phase6` with the original artifact |
 
-For this existing workspace, rerun **`make phase5`** to verify/reuse Phase 5 development and archived final evidence.
-It requires completed Phase 4 caches; `make phase4` still verifies that earlier work.
-`make phase3` remains available for baseline reproduction. Once partitions are frozen,
-full-cohort Phase 2 EDA is blocked; use its archived notebook/reports. Do not delete the lock
-to explore test data. `make split` verifies existing hashes or reconstructs the same assignments
-from verified raw data in a fresh checkout; it refuses silent reallocation or overwrite.
-CI executes source inspection and EDA first, then explicitly runs `make split` before
-`make phase3`, then `make phase4` and `make phase5`. Phase 5 reproduces validation explanations and verifies
-archived final-result hashes; it never repeats real test scoring. Freezing before the EDA notebook would correctly
-trigger the test-access guard.
-The baseline-notebook target also verifies the split as a prerequisite.
+Keep `.venv` and `.venv-demo` separate: the UI's Arrow dependency changes pandas string storage
+and breaks historical split tests if merged. Frozen requirements and evaluation guards remain
+intact. Do not rerun full-cohort EDA after freezing or execute `make final-eval` again. CI checks
+archived final evidence without repeating its prediction pass.
 
-Frozen CSV serialization fixes UTF-8, LF line endings, compression level, zero timestamp and
-the original gzip OS header byte (19). Python 3.12 otherwise lets zlib write a host-dependent
-OS byte, changing compressed-file hashes without changing patient assignments
-([Python gzip documentation](https://docs.python.org/3.12/library/gzip.html#gzip.compress)).
-The original manifest, partition hashes and allocation are preserved. Reconstruction is staged
-and checked against the entire committed contract before becoming the local frozen split;
-a mismatch leaves the manifest untouched and no replacement lock.
-Fifteen additional split regression cases cover platform headers, reconstruction and failure
-handling; eleven reporting cases protect reviewed conclusions. The suite had 119 tests at the
-start of Phase 4, which adds 39 cases. Phase 3 reports retain their original execution results.
+## Documentation
 
-`requirements.txt` pins the environment used by all five phases. Phase 4 adds Optuna 5.0.0,
-MLflow-skinny 3.16.1 and its local SQLite dependencies without changing earlier package pins.
-Platform-only packages use markers.
-Exact pinned versions were tested on Python 3.12/macOS arm64; other Python/platform combinations
-are not verified locally. If a pin is unavailable, resolve `python -m pip install '.[dev]'`
-in a fresh environment and record a separate lock instead of silently changing this one.
-`pyproject.toml` declares direct dependencies and optimization/API/demo extras.
-The broad historical modeling extra remains deferred and is not required for serving.
-Phase 3 uses scikit-learn estimators. Phase 4 adds Optuna/local MLflow; Phase 5 adds SHAP
-0.52.0 with slicer/numba/llvmlite without changing earlier pins. No SMOTE, additional booster
-package was added. Phase 6 adds pinned API and isolated UI environments; the original
-`requirements.txt` remains byte-identical because it is protected by the final evaluation lock.
-Use `make install-phase6` for current development tests and `make install-demo` for UI tests.
+| Reader goal | Start here |
+|---|---|
+| Understand analytical choices | [Case study](docs/project_case_study.md) |
+| Explore the app in two minutes | [Synthetic demo walkthrough](docs/demo_walkthrough.md) |
+| Prepare for an interview | [Interview walkthrough](docs/interview_walkthrough.md) |
+| Review career-facing summaries | [Resume bullets](docs/resume_bullets.md) · [Portfolio descriptions](docs/portfolio_description.md) |
+| Audit the model | [Model card](docs/model_card.md) · [Specification](reports/modeling/final_model_specification.json) · [Pretest protocol](reports/modeling/final_evaluation_protocol.md) |
+| Inspect data and analysis | [Dataset selection](docs/dataset_selection.md) · [Data dictionary](docs/data_dictionary.md) · [Notebooks](notebooks/) |
+| Reproduce engineering | [Local setup/API contract](docs/local_demo.md) · [Phase 6 evidence](reports/serving/phase6_verification.md) · [Portfolio audit](reports/portfolio/phase7_audit.md) |
+| Follow earlier decisions | [Historical development record](docs/development_history.md) |
 
-Use `make download`, `make inspect`, `make notebook`, `make verify`, `make test`, or `make lint`
-for Phase 1 steps. `make eda` rebuilds the cohort/reports/figures; `make eda-notebook` executes
-the complete Phase 2 analysis and embeds its outputs. `make phase2` executes that notebook,
-checks the environment, lints and runs the complete test suite. It expects Phase 1 source files
-and reports to exist. To work interactively, run `.venv/bin/jupyter lab`; the Python kernel
-must use this project's virtual environment. No global kernel registration is required.
-`make notebook` registers the ReadmitIQ kernel inside `.venv` and executes with that interpreter.
+**Data attribution:** [UCI Diabetes 130-US Hospitals, 1999–2008](https://doi.org/10.24432/C5230J),
+Clore, Cios, DeShazo and Strack (2014); CC BY 4.0, as recorded in the dataset selection document.
+**Repository code:** no LICENSE file has been selected; the dataset's license does not establish
+a license for this code. The repository owner must choose one.
 
-`make baselines` runs the fixed development registry and rebuilds its reports/figures.
-`make baseline-notebook` executes notebook 03, including those experiments. `make phase3` adds
-environment, lint and complete test checks. Model settings and paths live in `configs/phase3.yaml`.
-Reviewed report prose is guarded against changed AP/error evidence; new experiments require a
-fresh review of conclusions rather than silently retaining the prior narrative.
-The [CI reproduction review](reports/modeling/ci_reproduction_review.md) records the small
-random-forest difference observed between macOS arm64 and Linux x86_64. Both reviewed AP values
-are explicitly recognized with the original numerical tolerance; other changes still require
-review. Forest comparison prose uses the current paired estimate and interval, and checks that
-its ranking, inconclusive interval and default-threshold confusion counts remain unchanged.
-
-`make optimize` performs or verifies training-only searches and sealed candidate fits.
-`make optimization-reports` scores the fixed candidates once on validation, or verifies/reuses
-their cached predictions, then rebuilds aggregate reports and figures. `make optimization-notebook`
-executes the complete Phase 4 workflow; `make phase4` adds artifact/environment verification,
-lint and the full test suite. It requires the existing frozen split and Phase 3 reference artifacts.
-Missing or changed splits fail; Phase 4 never reconstructs them. Changed training code, policy,
-dependencies, model bytes or prediction bytes cannot silently reuse the prior comparison.
-Do not delete seals/caches to reopen tuning after validation has informed selection.
-
-MLflow runs are local to ignored `mlruns/phase4/tracking.sqlite`, with explicit local tracking
-and registry URIs, no credentials, no server and no raw-data uploads. Run IDs, parameters,
-CV/final metrics, Git revision, seed and development artifact paths are recorded. Inspect locally:
-
-```python
-from pathlib import Path
-from mlflow.tracking import MlflowClient
-
-uri = "sqlite:///" + str(Path("mlruns/phase4/tracking.sqlite").resolve())
-client = MlflowClient(tracking_uri=uri, registry_uri=uri)
-experiment = client.get_experiment_by_name("ReadmitIQ-Phase4")
-runs = client.search_runs([experiment.experiment_id])
-```
-
-Source settings live in `configs/config.yaml`; Phase 2 policy lives in `configs/phase2.yaml`.
-Source hashes enforce the reviewed release. A changed
-download fails verification and requires review. Raw data, `.venv`, credentials, caches and
-model files are excluded from Git. No credentials or `.env` are required. Optional overrides
-are documented in `.env.example`. The frozen split and estimator seed is 42.
-
-## Structure
-
-```text
-configs/                     Source/cohort contracts, split, baseline and optimization policies
-data/{raw,interim,processed}/ Verified raw; ignored cohort and compressed frozen partitions
-docs/                        Dataset selection and source dictionary
-app/                         Streamlit UI calling the local FastAPI service
-examples/synthetic/          Hand-authored JSON and CSV demonstration inputs
-notebooks/                   Executed notebooks 01–06
-src/readmit_iq/data/          Download, load, validate and inspect modules
-src/readmit_iq/analysis/      Feature audit, patient-cluster statistics, reports and plots
-src/readmit_iq/modeling/      Splits, features, encoders, pipelines, training and validation
-src/readmit_iq/optimization/  Group CV, Optuna, calibration, local tracking and development selection
-src/readmit_iq/decision_support/ Ranking, SHAP, uncertainty, subgroup and frozen final evaluation
-src/readmit_iq/serving/       Verified loader, strict API schemas, eligibility and batch ranking
-reports/data_quality/        Raw checks, cohort report, feature audit and missingness decisions
-reports/eda/                 Reproducible descriptive tables and summary JSON
-reports/figures/eda/          Seven reviewed EDA figures
-reports/modeling/            Frozen manifest, feature policy and validation results
-reports/serving/             Synthetic parity, container and latency verification
-reports/figures/modeling/    Four baseline figures plus six Phase 4 figures
-reports/figures/phase5/       Eight reviewed explanation/operational/final-result figures
-scripts/                     Environment verification and notebook execution
-tests/                       Source, cohort, split, feature, encoding and model-pipeline checks
-models/development/          Ignored experimental pipelines and validation/test prediction caches
-models/final/                Ignored byte-identical frozen primary and metadata
-mlruns/phase4/               Ignored local SQLite experiment tracking
-Dockerfile / docker-compose.yml  Separate API and UI images; read-only model mount
-```
-
-The `src/readmit_iq` package separates imports from the repository root. A regular package
-installation is used because this local macOS environment hides editable-install `.pth` files.
-After modifying source modules, reinstall with `python -m pip install --no-deps --no-build-isolation .`.
-Run commands from the repository root, or set `READMITIQ_CONFIG` to the YAML file's full path.
-Phase 6 adds the `serving` package, Streamlit app, Docker targets and service CI;
-its [local instructions](docs/local_demo.md) describe artifact restoration and isolation.
-The GitHub repository is [Ajay0612/readmit-iq](https://github.com/Ajay0612/readmit-iq),
-with `main` as the development branch and `origin` as the local remote.
-Only project source, configuration, tests, documentation, executed notebooks, aggregate reports
-and figures are versioned; downloaded data, processed partitions, development models and local
-environment files stay outside Git.
-The GitHub Actions workflow executes all six notebooks, the full bounded search, lint and tests
-on Python 3.12
-for pushes and pull requests. See [workflow runs](https://github.com/Ajay0612/readmit-iq/actions)
-for remote execution status. Earlier verification reports describe their original execution state.
-
-## Reproducing Phase 5 without reopening test
-
-`make phase5-development` executes notebook 05 using validation only. `make final-notebook`
-verifies the committed protocol and reviews archived aggregate results. `make phase5` runs
-both notebooks, environment checks, lint, the 196 earlier-phase tests and artifact reconciliation. Notebook
-05 stores its validation figure copies in an ignored cache; it cannot overwrite final figures.
-
-The original explicit **`make final-eval`** command was run once after commit `ce2fcdb` froze
-the decisions. It is deliberately absent from CI and normal reproduction targets. On the
-original workspace, any later analysis reuses hash-verified cached predictions; on a fresh
-checkout containing published results it refuses a new real prediction pass. Do not delete
-locks/caches to rescore. Models and individual predictions remain ignored; the
-[metadata](reports/modeling/final_model_metadata.json) and
-[aggregate publication hashes](reports/modeling/phase5/test/publication_manifest.json) preserve provenance.
-CI checks archived test evidence against its original freeze while reproducing validation on
-Linux; it does not claim to reproduce the original macOS binary bytes.
-
-Phase 5 local verification: **196 tests passed**, Ruff and dependency checks passed, notebook
-05 executed **8 code cells** and notebook 06 **7 code cells**, each with **8 embedded figures**.
-No test record is opened or prediction invoked by the artifact verifier. See the
-[verification record](reports/modeling/phase5/verification.json).
-
-## Next phase
-
-Phase 6 packages the frozen Phase 5 model without new modeling decisions or test evaluation.
-The [original Phase 6 recommendation](reports/modeling/phase6_recommendation.md) is retained as
-historical evidence. A separately authorized Phase 7 can polish the portfolio narrative and
-demonstration walkthrough. Cloud hosting and clinical validation remain separate decisions.
+For reproduction questions or proposed changes, open an issue with the command, environment
+and a synthetic example. Do not attach patient data, credentials or model binaries.
