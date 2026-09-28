@@ -87,3 +87,7 @@ docker-run: verify-model
 	docker compose up -d --wait
 docker-stop:
 	docker compose down
+
+.PHONY: docs-check
+docs-check:
+	$(PYTHON) scripts/check_documentation.py

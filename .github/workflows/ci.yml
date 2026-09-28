@@ -24,6 +24,8 @@ jobs:
         run: python -m venv .venv
       - name: Install project dependencies
         run: make install-phase6
+      - name: Check portfolio links, headline metrics and archived figures
+        run: make docs-check
       - name: Download and verify the public source
         run: make download inspect
       - name: Execute source and EDA notebooks before freezing
