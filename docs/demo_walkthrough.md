@@ -6,7 +6,8 @@ demo endpoint or HIPAA compliance is claimed.
 
 ## Watch without installing
 
-[Watch the short synthetic demonstration recording](media/readmitiq-demo.webm).
+[Download the short synthetic demonstration recording](media/readmitiq-demo.webm).
+On GitHub, choose **View raw** to download the WebM file, then open it in a browser or video player.
 It shows the actual local Streamlit application calling FastAPI. The recording is an abridged
 walkthrough with no narration; the steps below provide its accessible text alternative.
 

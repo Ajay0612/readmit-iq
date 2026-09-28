@@ -58,6 +58,11 @@ captions preserve each takeaway on narrow screens. The 19.64-second recording wa
 its single-score, batch-selection and ranked-chart frames inspected. The recording and two
 screenshots total 1,613,921 bytes.
 
+The published GitHub README was also checked at desktop and mobile widths: both diagrams
+render and the five figure links resolve. The published walkthrough displays both screenshots.
+GitHub offers the WebM as a download, so the walkthrough explicitly explains **View raw** and
+local playback rather than promising an embedded GitHub player.
+
 ## Demonstration and engineering checks
 
 The Phase 7 serving run passed **91 backend tests**, including the four original-artifact
